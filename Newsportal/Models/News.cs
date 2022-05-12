@@ -22,7 +22,7 @@ namespace Newsportal.Models
         public bool BreakingNews { get; set; } = false;
         public bool FeaturedNews { get; set; } = false;
         public bool IsPublished { get; set; } = false;
-
+//this is just a commit to track changes in github!
 
 
 
