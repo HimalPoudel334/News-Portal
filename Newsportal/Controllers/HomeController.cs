@@ -63,11 +63,7 @@ namespace Newsportal.Controllers
         }
         public string ShowUserType()
         {
-            if (this.User.IsInRole("Admin"))
-            {
-                return "Admin";
-            }
-            return "Hi";
+            return this.User.IsInRole("Admin") ? "Admin" : "Hi";
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

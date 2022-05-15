@@ -20,6 +20,12 @@ namespace Newsportal.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public IActionResult CreateRole()
         {
             return View();
