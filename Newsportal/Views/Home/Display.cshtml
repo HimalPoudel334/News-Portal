@@ -4,72 +4,34 @@
     ViewData["Title"] = "Display";
 }
 
-<h1>Display</h1>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Count)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PublishedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BreakingNews)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FeaturedNews)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsPublished)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Count)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PublishedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BreakingNews)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FeaturedNews)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsPublished)
-            </td>
-            <td>
-                @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
-            </td>
-        </tr>
+@if (!Model.Any())
+{
+    <h1>Ops! No news in this category to display</h1>
 }
-    </tbody>
-</table>
+
+<div class="row mb-2  h-auto">
+@{
+    foreach (var news in Model)
+    {
+        var newsContent = Html.Raw(news.Content[..300]);
+
+        <div class="col-md-6">
+            <div class="card flex-md-row mb-4 shadow-sm">
+                <div class="card-body d-flex flex-column align-items-start">
+                    <strong class="d-inline-block mb-2 text-primary">@news.Category.CategoryName</strong>
+                    <h3 class="mb-0">
+                        <a class="text-dark" href="#">@news.Title post</a>
+                    </h3>
+                    <div class="mb-1 text-muted">@news.PublishedDate.Month/@news.PublishedDate.Day</div>
+                    <p class="card-text mb-auto">@newsContent ...</p>
+                    <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@news.Id">Continue reading</a>
+                </div>
+                @if (news.Image != "/images/")
+                {
+                    <img class="card-img-right flex-auto d-none d-lg-block" data-src="@news.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@news.Image" data-holder-rendered="true">
+                }
+            </div>
+        </div>           
+    }
+}
+</div>

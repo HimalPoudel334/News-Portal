@@ -7,7 +7,7 @@ namespace Newsportal.Models
     public class Reporter : IdentityUser
     {
         [Required]
-        [Display(Name = "LicenseNumber")]
+        [Display(Name = "License Number")]
         public string LisenceNumber { get; set; }
         
         [Required]

@@ -46,7 +46,7 @@ namespace Newsportal.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
+            [EmailAddress] [RegularExpression("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", ErrorMessage = "Enter a valid email address")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
@@ -57,18 +57,17 @@ namespace Newsportal.Areas.Identity.Pages.Account
             [Display(Name = "Lisence Number")]
 
             public string LisenceNumber { get; set; }
-            [Required]
 
+            [Required]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
+        
             [Required]
-
+            [Display(Name = "Last Name")]
             public string LastName { get; set; }
+        
             [Required]
             public string Address { get; set; }
-
-
-
-
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]

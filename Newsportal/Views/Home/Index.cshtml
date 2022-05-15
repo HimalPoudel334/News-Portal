@@ -13,7 +13,7 @@
                 <a class="text-muted" href="#">Subscribe</a>
             </div>
             <div class="col-4 text-center">
-                <a class="blog-header-logo text-dark" asp-controller="home" asp-action="Index">Newsportal</a>
+                <a class="blog-header-logo text-dark" asp-controller="home" asp-action="Index">News Portal</a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
                 <a class="text-muted" href="#">
@@ -186,7 +186,7 @@
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews1.Id">Continue reading</a>
 
                 </div>
-                @if (normalNews1.Image != null)
+                @if (normalNews1.Image != "/images/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="@normalNews1.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@normalNews1.Image" data-holder-rendered="true">
@@ -204,7 +204,7 @@
                     <p class="card-text mb-auto">@normalnews2Text ...</p>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews2.Id">Continue reading</a>
 
-                </div>  @if (normalNews2.Image != null)
+                </div>  @if (normalNews2.Image != "/images/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" src="@normalNews2.Image" data-holder-rendered="true" style="width: 200px; height: 250px;">
