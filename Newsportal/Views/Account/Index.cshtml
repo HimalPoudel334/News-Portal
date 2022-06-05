@@ -1,0 +1,82 @@
+@model IEnumerable<User>
+
+@{
+    ViewBag.Title = "All Users";
+    Layout = "_LayoutAdmin";
+}
+
+<h1>All Users</h1>
+
+@if (Model.Any())
+{
+    <a asp-action="Register" asp-controller="Account"
+       class="btn btn-primary mb-3" style="width:auto">
+        Add new user
+    </a>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </th>
+                <th>
+                    Full Name
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserType)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserType)
+                    </td>
+                    <td>
+                       @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                       <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                       <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            No users created yet
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                Use the button below to create a user
+            </h5>
+            <a class="btn btn-primary" style="width:auto"
+               asp-controller="Account" asp-action="Register">
+                Add new user
+            </a>
+        </div>
+    </div>
+}
+
+
+@*<div class="user-name">
+    @user.FirstName @user.LastName
+</div>
+@if (userRoles.Any())
+{
+    <div class="user-designation">
+        @userRoles.First()
+    </div>  
+}
+</div>*@

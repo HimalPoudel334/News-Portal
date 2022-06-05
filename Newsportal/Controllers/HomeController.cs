@@ -28,11 +28,6 @@ namespace Newsportal.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            var user = (Reporter)await _userManager.GetUserAsync(this.User);
-
-
-            //  return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).ToListAsync());
-            // return View("~/Views/News/Index.cshtml", await _context.News.Include(n => n.Reporter).Include(n => n.Category).ToListAsync());
             ViewBag.CategoriesList = await _context.Category.ToListAsync();
             return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).Where(n => n.IsPublished).ToListAsync());
         }

@@ -141,7 +141,7 @@
           <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <div class="user-profile">
               <div class="user-image">
-                <img src="~/images/admin/faces/face28.png">
+                <img src="~/images/admin/faces/loginAvatar.jpeg">
               </div>
               <div class="user-name">
                 @user.FirstName @user.LastName
@@ -173,7 +173,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" asp-action="" asp-controller="">
+                <a class="nav-link" asp-action="Index" asp-controller="Account">
                   <i class="icon-file menu-icon"></i>
                   <span class="menu-title">Users</span>
                 </a>
@@ -260,11 +260,11 @@
       <script src="~/js/admin/dashboard.js"></script>
     <!-- End custom js for this page-->
     
-    @*<!-- default js from _Layout -->
+    <!-- default js from _Layout -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <!-- end -->*@
+    <!-- end -->
     
     @await RenderSectionAsync("Scripts", required: false)
     </body>

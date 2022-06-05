@@ -29,7 +29,7 @@ namespace Newsportal.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Discriminator = table.Column<string>(type: "TEXT", nullable: false),
-                    LisenceNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    LicenseNumber = table.Column<string>(type: "TEXT", nullable: true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: true),
                     LastName = table.Column<string>(type: "TEXT", nullable: true),
                     Address = table.Column<string>(type: "TEXT", nullable: true),

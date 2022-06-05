@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Newsportal.Models
 {
@@ -48,7 +49,31 @@ namespace Newsportal.Models
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        public decimal Rating { get; set; } = 0;
+        public decimal Rating
+        {
+            get
+            {
+                if (!Ratings.Any()) return 0;
+                var newsRatings = Ratings.Where(r => r.NewsId == Id).ToList();
+                var totalRatings = newsRatings.Sum(r => r.Rating);
+                return totalRatings / newsRatings.Count;
+            }
+            set { }
+        }
+        public int TotalLikes
+        {
+            get
+            {
+                return !Likes.Any() ? 0 : Likes.Count(l => l.NewsId == Id);
+            }
+            set { }
+        }
+
+        //wondering whether all the records from ratings will come or just the one with this news
+        public ICollection<NewsRating> Ratings { get; set; } = new List<NewsRating>(); 
         
+        //wondering whether all the records from likes will come or just the one with this news
+        public ICollection<NewsLikes> Likes { get; set; } = new List<NewsLikes>();
+
     }
 }
