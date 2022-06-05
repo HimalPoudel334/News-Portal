@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newsportal.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Newsportal.Controllers
 {
@@ -59,9 +60,9 @@ namespace Newsportal.Controllers
             return View(model);
         }
         [HttpGet]
-        public IActionResult ListRoles()
+        public async Task<IActionResult> ListRoles()
         {
-            var roles = roleManager.Roles;
+            var roles = await roleManager.Roles.ToListAsync();
             return View(roles);
         }
         [HttpGet]
