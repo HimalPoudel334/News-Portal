@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,8 +8,19 @@ namespace Newsportal.Models
 {
     public class News
     {
-        public int Id { get; set; }
-        public int Count { get; set; } = 0;
+        protected News()
+        {
+            
+        }
+        public News(DateTime publishedDate, Reporter reporter, Category category)
+        {
+            PublishedDate = publishedDate;
+            Reporter = reporter;
+            Category = category;
+        }
+        
+        public int Id { get; init; }
+        public int Count { get; set; }
         
         [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
@@ -26,19 +38,17 @@ namespace Newsportal.Models
         public IFormFile ImageFile { get; set; }
         
         [Display(Name = "Braking News")]
-        public bool BreakingNews { get; set; } = false;
+        public bool BreakingNews { get; set; }
         
         [Display(Name = "Featured News")]
-        public bool FeaturedNews { get; set; } = false;
+        public bool FeaturedNews { get; set; }
         
         [Display(Name = "Is Published")]
-        public bool IsPublished { get; set; } = false;
-//this is just a commit to track changes in github!
+        public bool IsPublished { get; set; }
 
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-
-
-
-
+        public decimal Rating { get; set; } = 0;
+        
     }
 }

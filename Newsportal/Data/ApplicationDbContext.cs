@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newsportal.Models;
 
 namespace Newsportal.Data
 {
@@ -11,5 +12,6 @@ namespace Newsportal.Data
         }
         public DbSet<Newsportal.Models.News> News { get; set; }
         public DbSet<Newsportal.Models.Category> Category { get; set; }
+        public DbSet<Comment> Comments { get; set; }
     }
 }
