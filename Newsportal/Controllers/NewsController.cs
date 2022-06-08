@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Newsportal.Controllers
 {
@@ -18,13 +19,14 @@ namespace Newsportal.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILogger<NewsController> _logger;
 
-        public NewsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment hostEnvironment)
+        public NewsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment hostEnvironment, ILogger<NewsController> logger)
         {
             _context = context;
             _userManager = userManager;
             webHostEnvironment = hostEnvironment;
-
+            _logger = logger;
         }
 
         // GET: News
@@ -32,8 +34,8 @@ namespace Newsportal.Controllers
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
             if (User.IsInRole("Admin"))
-                return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).ToListAsync());
-            return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).Where(a => a.Reporter.Id == user.Id).ToListAsync());
+                return View(await _context.News.ToListAsync());
+            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).ToListAsync());
         }
 
         // GET: News/Details/5
@@ -107,7 +109,7 @@ namespace Newsportal.Controllers
             ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
 
 
-            var news = await _context.News.Include(i => i.Reporter).Include(i => i.LastEditedBy).Include(i => i.Category).FirstOrDefaultAsync(i => i.Id == id.Value);
+            var news = await _context.News.FirstOrDefaultAsync(i => i.Id == id.Value);
             var user = await _userManager.GetUserAsync(this.User);
             /*if (news.IsPublished) { return Content("Cannot edit Published news"); }*/
             //await db.Items.Include(i => i.ItemVerifications).FirstOrDefaultAsync(i => i.Id == id.Value);
@@ -197,7 +199,7 @@ namespace Newsportal.Controllers
 
             if (model.ImageFile != null)
             {
-                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images/news");
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -207,5 +209,45 @@ namespace Newsportal.Controllers
             }
             return "/images/" + uniqueFileName;
         }
+        
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> LikeNews(int newsId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var news = await _context.News.FindAsync(newsId) ?? throw new Exception("News Not found");
+            var isLiked = true;
+            try
+            {
+                var newsLike = await _context.NewsLikes.FirstOrDefaultAsync(n => n.NewsId == news.Id && n.UserId == user.Id);
+                if (newsLike != null)
+                {
+                    isLiked = false;
+                    _context.NewsLikes.Remove(newsLike);
+                }
+                else
+                {
+                    newsLike = new NewsLikes((User) user, news);
+                    _context.NewsLikes.Add(newsLike);
+                }
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("DbUpdateException ho yo " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("Generic exception ho yo " + ex.Message);
+
+            }
+            
+            return Ok(new { news.TotalLikes, isLiked });
+
+        }
     }
+    
+    
 }

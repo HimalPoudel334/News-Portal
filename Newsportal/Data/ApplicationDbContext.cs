@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newsportal.Models;
 
 namespace Newsportal.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            
         }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,6 +23,7 @@ namespace Newsportal.Data
             
             base.OnModelCreating(modelBuilder);
         }
+        
         public DbSet<Newsportal.Models.News> News { get; set; }
         public DbSet<Newsportal.Models.Category> Category { get; set; }
         public DbSet<Comment> Comments { get; set; }

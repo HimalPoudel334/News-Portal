@@ -1,7 +1,12 @@
 ﻿@model Newsportal.Models.News
 
+
 @{
     ViewData["Title"] = @Model.Title;
+    Layout = "_Layout";
+}
+@{
+    var cls = @Model.UserLikes ? "btn btn-primary" : "btn btn-secondary";
 }
 <div class="container mt-5">
     <div class="row">
@@ -28,28 +33,68 @@
                 <section class="mb-5">
                     @Html.Raw(Model.Content)
                 </section>
+                <!--End -->
+                <!--Likes and rating section-->
+                <div class="d-flex justify-content-around mb-3">
+                    <!--Likes section-->
+                    <p class="my-3">
+                        <p id="totalLikes">@Model.TotalLikes</p> <button class="@cls" onclick="likeNews()" id="likeButton">Likes</button>
+                    </p>
+                    <!--Rating section-->
+                    <p class=" my-3">
+                        <p id="totalRating">@Model.Rating</p> Rating
+                    </p>
+                </div>
+                <!--End-->
+
+                
             </article>
             <!-- Comments section-->
-            <section class="mb-5">
+            @*<section class="mb-5">
                 <div class="card bg-light">
                     <div class="card-body">
                         <!-- Comment form-->
-                        <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
-                        <!-- Comment with nested comments-->
-                        <div class="d-flex mb-4">
+                        <form class="mb-4">
+                            <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
+                            <button type="submit" id="commentButton" class="btn btn-primary">Comment</button>
+                        </form>
+                        @foreach (var comment in Model.Comments)
+                        {
+                            <!-- Comment with nested comments-->
+                            <div class="d-flex mb-4">
                             <!-- Parent comment-->
                             <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                             <div class="ms-3">
-                                <div class="fw-bold">Commenter Name</div>
-                                If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
-                                <!-- Child comment 1-->
-                                <div class="d-flex mt-4">
-                                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
-                                    <div class="ms-3">
-                                        <div class="fw-bold">Commenter Name</div>
-                                        And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
+                            <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.LastName</div>
+                            <p>HERE SHOULD BE THE ACTUAL COMMENT: @comment.Content</p>
+                            @if (comment.Replies.Any())
+                            {
+                                foreach (var reply in comment.Replies)
+                                {
+                                    <!-- Child comment 1-->
+                                    <div class="d-flex mt-4">
+                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                        <div class="ms-3">
+                                            <div class="fw-bold">@reply.CommentedBy.FirstName @reply.CommentedBy.FirstName</div>
+                                            <p>HERE SHOULD BE THE COMMENT REPLY: @reply.Content</p>
+                                        </div>
+                                        @if (comment.Replies.Any())
+                                        {
+                                            foreach (var rep in reply.Replies)
+                                            {
+                                                <!-- Child comment 1-->
+                                                <div class="d-flex mt-4">
+                                                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                                                    <div class="ms-3">
+                                                        <div class="fw-bold">@rep.CommentedBy.FirstName @rep.CommentedBy.FirstName</div>
+                                                        <p>HERE SHOULD BE THE COMMENT REPLY: @rep.Content</p>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
                                     </div>
-                                </div>
+                                }
+                            }
                                 <!-- Child comment 2-->
                                 <div class="d-flex mt-4">
                                     <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
@@ -68,9 +113,10 @@
                                 When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
                             </div>
                         </div>
+                    }
                     </div>
                 </div>
-            </section>
+            </section>*@
         </div>
         <!-- Side widgets-->
         <div class="col-lg-4">
@@ -91,16 +137,16 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
-                                <li><a href="#!">Web Design</a></li>
-                                <li><a href="#!">HTML</a></li>
-                                <li><a href="#!">Freebies</a></li>
+                                <li><a href="#!">National</a></li>
+                                <li><a href="#!">International</a></li>
+                                <li><a href="#!">Politics</a></li>
                             </ul>
                         </div>
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
-                                <li><a href="#!">JavaScript</a></li>
-                                <li><a href="#!">CSS</a></li>
-                                <li><a href="#!">Tutorials</a></li>
+                                <li><a href="#!">Fashon</a></li>
+                                <li><a href="#!">Economy</a></li>
+                                <li><a href="#!">Sports</a></li>
                             </ul>
                         </div>
                     </div>
@@ -119,3 +165,48 @@
 
     <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function likeNews() {
+            let likesElement = $("#totalLikes");
+            let totalLikes = parseInt(likesElement.text());
+            console.log(totalLikes);
+            const newsId = @Model.Id;
+            
+            const url = '@Url.Action("LikeNews", "News")' + '?newsId=' + newsId;
+            console.log(url);
+            $.ajax({
+                url: url,
+                contentType: 'application/html; charset=utf-8',
+                type: 'POST',
+                beforeSend: function () {
+                },
+                success: function (result) {
+                    console.log(result);
+                    likesElement.text(result?.totalLikes)
+                    if (result.isLiked === true){
+                        $("#likeButton").attr("class", "btn btn-primary");    
+                    }else {
+                        $("#likeButton").attr("class", "btn btn-secondary");
+                    }
+                    
+                    
+                },
+                error: function (errorResponse) {
+                    console.log(errorResponse)
+                }
+            });
+            
+        }
+        
+        $(document).ready(() => listComment(@Json.Serialize(Model.Comments)));
+        
+        const listComment = comments => {
+            console.log(comments);
+        }
+        
+    </script>
+
+}

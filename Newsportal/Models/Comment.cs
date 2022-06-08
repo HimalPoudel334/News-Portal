@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Newsportal.Models;
 
@@ -13,10 +14,13 @@ public class Comment
 
     public DateTime CommentedOn { get; set; } = DateTime.Now;
 
-    public User CommentedBy { get; set; }
+    public virtual User CommentedBy { get; set; }
 
-    public News News { get; set; }
-
-    public ICollection<Comment> Replies { get; set; }
+    public virtual News News { get; set; }
+    
+    [ForeignKey("Comment")] 
+    public int? CommentId { get; set; }
+    
+    public virtual ICollection<Comment> Replies { get; set; }
 
 }

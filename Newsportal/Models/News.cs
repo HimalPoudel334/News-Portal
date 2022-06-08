@@ -25,11 +25,11 @@ namespace Newsportal.Models
         
         [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
-        public Category Category { get; set; }
-        public Reporter Reporter { get; set; }
+        public virtual Category Category { get; set; }
+        public virtual Reporter Reporter { get; set; }
         
         [Display(Name = "Last Edited By")]
-        public Reporter LastEditedBy { get; set; } = null;
+        public virtual Reporter LastEditedBy { get; set; } = null;
 
         public string Title { get; set; }
         public string Content { get; set; }
@@ -47,7 +47,7 @@ namespace Newsportal.Models
         [Display(Name = "Is Published")]
         public bool IsPublished { get; set; }
 
-        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         public decimal Rating
         {
@@ -68,12 +68,14 @@ namespace Newsportal.Models
             }
             set { }
         }
+        
+        [NotMapped] public bool UserLikes { get; set; }
 
         //wondering whether all the records from ratings will come or just the one with this news
-        public ICollection<NewsRating> Ratings { get; set; } = new List<NewsRating>(); 
+        public virtual ICollection<NewsRating> Ratings { get; set; } = new List<NewsRating>(); 
         
         //wondering whether all the records from likes will come or just the one with this news
-        public ICollection<NewsLikes> Likes { get; set; } = new List<NewsLikes>();
+        public virtual ICollection<NewsLikes> Likes { get; set; } = new List<NewsLikes>();
 
     }
 }

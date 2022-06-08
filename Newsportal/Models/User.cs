@@ -18,7 +18,9 @@ public class User : IdentityUser
 
     public UserType UserType { get; set; } = UserType.Subscriber;
 
+    #nullable enable
     public string? Image { get; set; }
+    #nullable disable
 }
 
 public class Reporter : User
