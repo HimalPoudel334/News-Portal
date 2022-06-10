@@ -21,7 +21,7 @@
                     <!-- Post meta content-->
                     <div class="text-muted fst-italic mb-2">Posted on @Model.PublishedDate.Month/@Model.PublishedDate.Day @Model.PublishedDate.Hour:@Model.PublishedDate.Minute by @Model.Reporter.FirstName @Model.Reporter.LastName</div>
                     <!-- Post categories-->
-                    <a class="badge bg-info text-white text-decoration-none link-light" href="#!">@Model.Category.CategoryName</a>
+                    <a class="badge bg-info text-white text-decoration-none link-light" href="#">@Model.Category.CategoryName</a>
                 </header>
                 <!-- Preview image figure-->
                 @if (@Model.Image != null)
@@ -54,9 +54,9 @@
                 <div class="card bg-light">
                     <div class="card-body">
                         <!-- Comment form-->
-                        <form class="mb-4">
-                            <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
-                            <button type="submit" class="commentButton btn btn-primary mt-2">Comment</button>
+                        <form class="mb-4" id="topLevelCommentCreateForm">
+                            <textarea id="Content" class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
+                            <button type="submit" class="btn btn-primary mt-2">Comment</button>
                         </form>
                         @foreach (var comment in Model.Comments.ToList())
                         {
@@ -85,16 +85,16 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
-                                <li><a href="#!">National</a></li>
-                                <li><a href="#!">International</a></li>
-                                <li><a href="#!">Politics</a></li>
+                                <li><a href="#">National</a></li>
+                                <li><a href="#">International</a></li>
+                                <li><a href="#">Politics</a></li>
                             </ul>
                         </div>
                         <div class="col-sm-6">
                             <ul class="list-unstyled mb-0">
-                                <li><a href="#!">Fashon</a></li>
-                                <li><a href="#!">Economy</a></li>
-                                <li><a href="#!">Sports</a></li>
+                                <li><a href="#">Fashon</a></li>
+                                <li><a href="#">Economy</a></li>
+                                <li><a href="#">Sports</a></li>
                             </ul>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
         if (nest)
         {
             <!-- Child comment 1-->
-            <div class="d-flex mt-4" style="margin-left: @margin;">
+            <div class="d-flex mt-4 pl-1" style="margin-left: @margin; border-left-style: dashed">
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.FirstName</div>
@@ -190,7 +190,7 @@
             
         }        
         
-        function showCommentForm(element, commentId){
+        function showCommentForm(element, commentId = null){
             
             let form = document.getElementById("commentReplyForm");
             
@@ -200,28 +200,50 @@
                 _div.innerHTML = `
                     <form class="replyForm mb-4" id="commentReplyForm">
                         <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
-                        <button type="submit" class="commentButton btn btn-primary mt-2">Comment</button>
+                        <button type="button" class="commentButton btn btn-primary mt-2">Comment</button>
                     </form>
                 `;
-                element.appendChild(_div);
+                let parentNode = element.parentNode;
+                parentNode.appendChild(_div);
+                createComment(commentId);
             }else {
+                let parentElement = element.parentNode;      
                 let replyForm = document.getElementById("replyFormEnclosingDiv");
                 try {
-                    element.removeChild(replyForm);
-                }catch (e){                        
-                    let parentElement = replyForm.parentNode;
+                    parentElement.removeChild(replyForm);                           
+                }catch (e){
+                    parentElement = replyForm.parentNode;
                     parentElement.removeChild(replyForm);
                     showCommentForm(element);
                 }
             }
             
         }
-        $(".replyForm").submit((element, commentId) => {
-            element.preventDefault();
+        
+        $("#topLevelCommentCreateForm").submit((e) =>{
+            e.preventDefault();
             
-            console.log(element);
-            console.log(commentId);
+            const data = new FormData(e.target);
+            console.log(data);
+            const value = Object.fromEntries(data.entries());
+            console.log(value);       
+                
         });
+        
+        const createComment = commentId => {
+            $("#commentReplyForm").submit((e) =>{
+                e.preventDefault();
+                
+                const data = new FormData(e.target);
+                console.log(data);
+                const value = Object.fromEntries(data.entries());
+                value.CommentId = commentId;
+                console.log(value);       
+                    
+            });
+        }
+        
+        
         
     </script>
 
