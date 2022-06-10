@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newsportal.ViewModels;
 
 namespace Newsportal.Controllers
 {
@@ -245,7 +246,60 @@ namespace Newsportal.Controllers
             }
             
             return Ok(new { news.TotalLikes, isLiked });
+        }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateComment(CommentViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Please enter comment content");
+            }
+
+            var news = await _context.News.FindAsync(model.NewsId);
+            var user = (User) await _userManager.GetUserAsync(User);
+            
+            if (user == null || news == null)
+            {
+                return BadRequest("Please login first, Cannot find news");
+            }
+
+            Comment actualComment = null;
+            if (model.CommentId != null)
+            {
+                actualComment = await _context.Comments.FindAsync(model.CommentId);
+            }
+
+            var comment = new Comment()
+            {
+                Content = model.CommentContent,
+                News = news,
+                CommentId = actualComment?.Id,
+                CommentedBy = user,
+                CommentedOn = DateTime.Now
+            };
+            
+            /*_context.Comments.Add(comment);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.LogError(e.Message);
+                return BadRequest(e.Message);
+            }*/
+
+            var reply = new
+            {
+                CommentedBy = $"{comment.CommentedBy.FirstName} {comment.CommentedBy.FirstName}",
+                comment.CommentedOn,
+                comment.Content,
+                comment.Id
+            };
+            
+            return Ok(reply);
         }
     }
     

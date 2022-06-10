@@ -55,13 +55,15 @@
                     <div class="card-body">
                         <!-- Comment form-->
                         <form class="mb-4" id="topLevelCommentCreateForm">
-                            <textarea id="Content" class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
+                            <textarea id="topLevelCommentContent" class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
                             <button type="submit" class="btn btn-primary mt-2">Comment</button>
                         </form>
-                        @foreach (var comment in Model.Comments.ToList())
-                        {
-                            ListComment(comment);
-                        }
+                        <div id="commentList">
+                            @foreach (var comment in Model.Comments.ToList())
+                            {
+                                ListComment(comment);
+                            }    
+                        </div>
                     </div>
                 </div>
             </section>
@@ -124,7 +126,7 @@
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.FirstName</div>
                     <p>HERE SHOULD BE THE COMMENT REPLY: @comment.Content</p>
                     <p>On: @comment.CommentedOn</p>
-                    <p onclick="showCommentForm(this, @comment.CommentId)" class="replyComment bg-light">Reply</p>
+                    <p onclick="showCommentForm(this, @comment.Id)" class="replyComment bg-light">Reply</p>
                 </div>
             </div>
             
@@ -138,7 +140,7 @@
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.LastName</div>
                     <p>HERE SHOULD BE THE ACTUAL COMMENT: @comment.Content</p>
                     <p>On: @comment.CommentedOn</p>
-                    <p onclick="showCommentForm(this, @comment.CommentId)" class="replyComment bg-light">Reply</p>
+                    <p onclick="showCommentForm(this, @comment.Id)" class="replyComment bg-light">Reply</p>
                 </div>
             </div>
 
@@ -190,7 +192,7 @@
             
         }        
         
-        function showCommentForm(element, commentId = null){
+        function showCommentForm(element, commentId){
             
             let form = document.getElementById("commentReplyForm");
             
@@ -199,13 +201,13 @@
                 _div.id = "replyFormEnclosingDiv";
                 _div.innerHTML = `
                     <form class="replyForm mb-4" id="commentReplyForm">
-                        <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
-                        <button type="button" class="commentButton btn btn-primary mt-2">Comment</button>
+                        <textarea class="form-control" id="commentReplyContent" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
+                        <button type="submit" class="commentButton btn btn-primary mt-2">Comment</button>
                     </form>
                 `;
                 let parentNode = element.parentNode;
                 parentNode.appendChild(_div);
-                createComment(commentId);
+                createComment(element, commentId);
             }else {
                 let parentElement = element.parentNode;      
                 let replyForm = document.getElementById("replyFormEnclosingDiv");
@@ -214,7 +216,7 @@
                 }catch (e){
                     parentElement = replyForm.parentNode;
                     parentElement.removeChild(replyForm);
-                    showCommentForm(element);
+                    showCommentForm(element, commentId);
                 }
             }
             
@@ -222,7 +224,6 @@
         
         $("#topLevelCommentCreateForm").submit((e) =>{
             e.preventDefault();
-            
             const data = new FormData(e.target);
             console.log(data);
             const value = Object.fromEntries(data.entries());
@@ -230,7 +231,36 @@
                 
         });
         
-        const createComment = commentId => {
+        function createComment(element, commentId) {
+            document.getElementById("commentReplyForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                              
+                const comment = {
+                    CommentId: commentId,
+                    CommentContent: $("#commentReplyContent").val(),
+                    NewsId: @Model.Id
+                }
+                console.log(comment);
+                const url = '@Url.Action("CreateComment", "News")';
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: comment, 
+                    beforeSend: function () {
+                        
+                    },
+                    success: function (result) {
+                        createAndAttachComment(result);
+                    },
+                    error: function (errorResponse) {
+                        console.log({errorResponse})
+                    }
+                });
+                
+            });
+        }
+        
+        const createComment1 = commentId => {
             $("#commentReplyForm").submit((e) =>{
                 e.preventDefault();
                 
@@ -243,6 +273,38 @@
             });
         }
         
+        function createAndAttachComment(result){
+            console.log({successResult: result});
+            let siblingNode = element.parentNode.parentNode;
+            let parentNode = document.getElementById("commentList");
+            let left = siblingNode.style.marginLeft;
+            let _div = document.createElement('div');
+            _div.className = "d-flex mt-4 pl-1";
+            if (left === ''){
+                left = 5;                            
+            }else {
+                left = parseInt(left.toString().replace("%", "")) + 5;
+            }
+            _div.style.borderLeftStyle = "dashed";
+            _div.style.marginLeft = `${left}%`;
+            _div.innerHTML = `                            
+                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                <div class="ms-3">
+                    <div class="fw-bold">${result?.commentedBy}</div>
+                    <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
+                    <p>On: ${result?.commentedOn}</p>
+                    <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
+                </div>
+            `;
+            let replyForm = document.getElementById("replyFormEnclosingDiv");
+            let parentElement = replyForm.parentNode;
+            parentElement.removeChild(replyForm);
+            insertAfter(siblingNode, _div); 
+        }
+        
+        function insertAfter(referenceNode, newNode) {
+            referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+        }
         
         
     </script>
