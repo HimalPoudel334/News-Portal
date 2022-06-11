@@ -49,8 +49,8 @@ namespace Newsportal.Models
 
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        public decimal Rating
-        {
+        [NotMapped]
+        public decimal Rating {
             get
             {
                 if (!Ratings.Any()) return 0;
@@ -58,18 +58,14 @@ namespace Newsportal.Models
                 var totalRatings = newsRatings.Sum(r => r.Rating);
                 return totalRatings / newsRatings.Count;
             }
-            set { }
-        }
-        public int TotalLikes
-        {
-            get
-            {
-                return !Likes.Any() ? 0 : Likes.Count(l => l.NewsId == Id);
-            }
-            set { }
+
         }
         
-        [NotMapped] public bool UserLikes { get; set; }
+        [NotMapped]
+        public int TotalLikes => !Likes.Any() ? 0 : Likes.Count(l => l.NewsId == Id);
+        
+        [NotMapped] 
+        public bool UserLikes { get; set; }
 
         //wondering whether all the records from ratings will come or just the one with this news
         public virtual ICollection<NewsRating> Ratings { get; set; } = new List<NewsRating>(); 

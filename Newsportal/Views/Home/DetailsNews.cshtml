@@ -120,7 +120,7 @@
         if (nest)
         {
             <!-- Child comment 1-->
-            <div class="d-flex mt-4 pl-1" style="margin-left: @margin; border-left-style: dashed">
+            <div class="d-flex mt-2 pl-1" style="margin-left: @margin; border-left-style: dashed">
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.FirstName</div>
@@ -133,7 +133,7 @@
         }
         else
         {
-            <div class="d-flex mb-4">
+            <div class="d-flex mt-4">
                 <!-- Parent comment-->
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
@@ -200,7 +200,7 @@
                 let _div = document.createElement('div');
                 _div.id = "replyFormEnclosingDiv";
                 _div.innerHTML = `
-                    <form class="replyForm mb-4" id="commentReplyForm">
+                    <form class="replyForm mb-2" id="commentReplyForm">
                         <textarea class="form-control" id="commentReplyContent" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
                         <button type="submit" class="commentButton btn btn-primary mt-2">Comment</button>
                     </form>
@@ -224,10 +224,41 @@
         
         $("#topLevelCommentCreateForm").submit((e) =>{
             e.preventDefault();
-            const data = new FormData(e.target);
-            console.log(data);
-            const value = Object.fromEntries(data.entries());
-            console.log(value);       
+            const comment = {
+                CommentContent: $("#topLevelCommentContent").val(),
+                NewsId: @Model.Id
+            }
+            
+            const url = '@Url.Action("CreateComment", "News")';
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: comment, 
+                    beforeSend: function () {
+                        
+                    },
+                    success: function (result) {
+                        $("#topLevelCommentContent").val("");
+                        let _div = document.createElement('div');
+                        _div.className = "d-flex mt-4";
+                        _div.innerHTML = `                            
+                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                            <div class="ms-3">
+                                <div class="fw-bold">${result?.commentedBy}</div>
+                                <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
+                                <p>On: ${result?.commentedOn}</p>
+                                <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
+                            </div>
+                        `;
+                        let replyForm = document.getElementById("commentList");
+                        insertAfter(replyForm, _div);
+                    
+                    },
+                    error: function (errorResponse) {
+                        sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
+                        
+                    }
+                });
                 
         });
         
@@ -239,24 +270,9 @@
                     CommentId: commentId,
                     CommentContent: $("#commentReplyContent").val(),
                     NewsId: @Model.Id
-                }
-                console.log(comment);
-                const url = '@Url.Action("CreateComment", "News")';
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: comment, 
-                    beforeSend: function () {
-                        
-                    },
-                    success: function (result) {
-                        createAndAttachComment(result);
-                    },
-                    error: function (errorResponse) {
-                        console.log({errorResponse})
-                    }
-                });
+                }              
                 
+                sendCommentToServer(element, comment);
             });
         }
         
@@ -273,13 +289,34 @@
             });
         }
         
-        function createAndAttachComment(result){
+        function sendCommentToServer(element, comment){
+            const url = '@Url.Action("CreateComment", "News")';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: comment, 
+                beforeSend: function () {
+                    
+                },
+                success: function (result) {
+                    createAndAttachComment(element, result);
+                },
+                error: function (errorResponse) {
+                    sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
+                    let replyForm = document.getElementById("replyFormEnclosingDiv");
+                    let parentElement = replyForm.parentNode;
+                    parentElement.removeChild(replyForm);
+                }
+            });
+        }
+        
+        function createAndAttachComment(element, result){
             console.log({successResult: result});
             let siblingNode = element.parentNode.parentNode;
             let parentNode = document.getElementById("commentList");
             let left = siblingNode.style.marginLeft;
             let _div = document.createElement('div');
-            _div.className = "d-flex mt-4 pl-1";
+            _div.className = "d-flex mt-2 pl-1";
             if (left === ''){
                 left = 5;                            
             }else {
@@ -304,6 +341,14 @@
         
         function insertAfter(referenceNode, newNode) {
             referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+        }
+        
+        function sweetAlert(type, title, message){
+            Swal.fire({
+              icon: type,
+              title: title,
+              text: message,
+            });
         }
         
         

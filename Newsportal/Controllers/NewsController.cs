@@ -280,7 +280,7 @@ namespace Newsportal.Controllers
                 CommentedOn = DateTime.Now
             };
             
-            /*_context.Comments.Add(comment);
+            _context.Comments.Add(comment);
             try
             {
                 await _context.SaveChangesAsync();
@@ -289,12 +289,12 @@ namespace Newsportal.Controllers
             {
                 _logger.LogError(e.Message);
                 return BadRequest(e.Message);
-            }*/
+            }
 
             var reply = new
             {
                 CommentedBy = $"{comment.CommentedBy.FirstName} {comment.CommentedBy.FirstName}",
-                comment.CommentedOn,
+                CommentedOn = comment.CommentedOn.ToString("g"),
                 comment.Content,
                 comment.Id
             };
