@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
@@ -19,11 +20,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\fonts" />
     <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\images\news" />
+    <Folder Include="wwwroot\images\user" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\images\admin\.DS_Store" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\maps\style.css.map" />
   </ItemGroup>
 
 </Project>

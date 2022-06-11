@@ -302,7 +302,7 @@ namespace Newsportal.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LisenceNumber")
+                    b.Property<string>("LicenseNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

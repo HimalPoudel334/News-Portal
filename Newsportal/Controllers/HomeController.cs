@@ -28,13 +28,23 @@ namespace Newsportal.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            var user = (Reporter)await _userManager.GetUserAsync(this.User);
+            var newsList = await _context.News.ToListAsync();
+            
+            var user = await _userManager.GetUserAsync(User);
 
+            if (user != null)
+            {
+                foreach (var news in newsList)
+                {
+                    if (news.Likes.Any(n => n.UserId == user.Id))
+                    {
+                        news.UserLikes = true;
+                    }
+                }    
+            }
 
-            //  return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).ToListAsync());
-            // return View("~/Views/News/Index.cshtml", await _context.News.Include(n => n.Reporter).Include(n => n.Category).ToListAsync());
             ViewBag.CategoriesList = await _context.Category.ToListAsync();
-            return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).Where(n => n.IsPublished).ToListAsync());
+            return View(newsList);
         }
 
         public IActionResult Privacy()
@@ -49,7 +59,25 @@ namespace Newsportal.Controllers
         }
         public async Task<IActionResult> DetailsNewsAsync(int id)
         {
-            var detailedNews = await _context.News.Include(n => n.Reporter).Include(n => n.Category).FirstOrDefaultAsync(n => n.Id == id);
+            var detailedNews = await _context.News
+                .Include(n => n.Comments.Where(c => c.CommentId == null))
+                .FirstOrDefaultAsync(n => n.Id == id);
+            
+            
+            if (detailedNews == null)
+            {
+                return NotFound();
+            }
+            
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                if (detailedNews.Likes.Any(n => n.UserId == user.Id))
+                {
+                    detailedNews.UserLikes = true;
+                }
+            }
+            
             if (!detailedNews.IsPublished)
             {
                 return Content("Why do you wish to manipulate through url?");
@@ -57,10 +85,9 @@ namespace Newsportal.Controllers
             detailedNews.Count++;
             await _context.SaveChangesAsync();
 
-
-
             return View(detailedNews);
         }
+        
         public string ShowUserType()
         {
             return this.User.IsInRole("Admin") ? "Admin" : "Hi";
