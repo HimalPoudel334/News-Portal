@@ -1,4 +1,5 @@
-﻿@model Newsportal.Models.News
+﻿@using System.Diagnostics.Metrics
+@model Newsportal.Models.News
 
 @{
     ViewData["Title"] = @Model.Title;
@@ -41,7 +42,7 @@
                         <span id="totalLikes">@Model.TotalLikes</span> <span onclick="likeNews()" id="likeButton" class="@cls">Likes</span>
                     </p>
                     <!--Comment section-->
-                    <p class=" my-1">
+                    <p id="commentCount" class="my-1">
                         @count Comments
                     </p>
                     <!--Rating section-->
@@ -72,7 +73,7 @@
                         <div id="commentList">
                             @foreach (var comment in Model.Comments.ToList())
                             {
-                                count = ListComment(comment);
+                                count = ListComment(comment, ++count);
                             }    
                         </div>
                     </div>
@@ -125,9 +126,8 @@
 @functions
 {
     //DFS algorithm
-    public int ListComment(Comment comment, bool nest = false, int width = 0)
+    public int ListComment(Comment comment, int count, bool nest = false, int width = 0)
     {
-        var count = 1;
         var margin = $"{width}%";
         if (nest)
         {
@@ -159,8 +159,7 @@
         }
         @foreach (var reply in comment.Replies.ToList())
         {
-            count++;
-            ListComment(reply, true, width + 5);
+            count = ListComment(reply, ++count, true, width + 5);
         }
         return count;
     }
@@ -288,20 +287,10 @@
                 sendCommentToServer(element, comment);
             });
         }
-        
-        const createComment1 = commentId => {
-            $("#commentReplyForm").submit((e) =>{
-                e.preventDefault();
+        $(document).ready(() => {
+            document.getElementById("commentCount").innerText = `@count Comments`;
+        });
                 
-                const data = new FormData(e.target);
-                console.log(data);
-                const value = Object.fromEntries(data.entries());
-                value.CommentId = commentId;
-                console.log(value);       
-                    
-            });
-        }
-        
         function sendCommentToServer(element, comment){
             const url = '@Url.Action("CreateComment", "News")';
             $.ajax({
