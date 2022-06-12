@@ -73,5 +73,10 @@ namespace Newsportal.Models
         //wondering whether all the records from likes will come or just the one with this news
         public virtual ICollection<NewsLikes> Likes { get; set; } = new List<NewsLikes>();
 
+        public void SetUserLikes(string userId)
+        {
+            UserLikes = Likes.Any(likes => likes.NewsId == Id && likes.UserId == userId);
+        }
+
     }
 }

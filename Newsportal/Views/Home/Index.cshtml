@@ -58,7 +58,27 @@
             </div>
 
             <hr />
-
+            <div class="d-flex justify-content-around">
+                <!--Likes section-->
+                <p class="my-3">
+                    @{
+                        var cls = breakingNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                    }
+                    <p id="totalLikes">@breakingNews.TotalLikes</p> <button class="@cls">Likes</button>
+                </p>
+                <!--Comment section-->
+                <p class=" my-3">
+                    @breakingNews.Comments.Count Comments
+                </p>
+                <!--Rating section-->
+                <div class="align-content-center" style="color:yellow;">
+                    Ratings 
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                    }
+                </div>
+            </div>
             <div class="d-flex justify-content-around">
                 <p class="my-3">
 
@@ -74,6 +94,7 @@
                     @breakingNews.PublishedDate
 
                 </p>
+                
                 <p class="lead my-3 mb-0"><a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@breakingNews.Id" class="text-primary font-weight-bold">Continue reading...</a></p>
 
             </div>
@@ -103,6 +124,28 @@
             </div>
 
             <hr />
+            
+            <div class="d-flex justify-content-around">
+                <!--Likes section-->
+                <p class="my-3">
+                    @{
+                        cls = newsTry.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                    }
+                    <p id="totalLikes">@newsTry.TotalLikes</p> <button class="@cls">Likes</button>
+                </p>
+                <!--Comment section-->
+                <p class=" my-3">
+                    @newsTry.Comments.Count Comments
+                </p>
+                <!--Rating section-->
+                <div class="align-content-center" style="color:yellow;">
+                    Ratings 
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                    }
+                </div>
+            </div>
 
             <div class="d-flex justify-content-around">
                 <p class="my-3">
@@ -143,6 +186,27 @@
                     </h3>
                     <div class="mb-1 text-muted">@secondFeatureNews.PublishedDate.Month/@secondFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@textTwo ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-3">
+                            @{
+                                cls = secondFeatureNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                            }
+                            <p id="totalLikes">@secondFeatureNews.TotalLikes</p> <button class="@cls">Likes</button>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-3">
+                            @secondFeatureNews.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="align-content-center" style="color:yellow;">
+                            Ratings 
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@secondFeatureNews.Id">Continue reading</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" data-src="@secondFeatureNews.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@secondFeatureNews.Image" data-holder-rendered="true">
@@ -157,6 +221,27 @@
                     </h3>
                     <div class="mb-1 text-muted">@thirdFeatureNews.PublishedDate.Month/@thirdFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@textThree ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-3">
+                            @{
+                                cls = thirdFeatureNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                            }
+                            <p id="totalLikes">@thirdFeatureNews.TotalLikes</p> <button class="@cls">Likes</button>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-3">
+                            @thirdFeatureNews.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="align-content-center" style="color:yellow;">
+                            Ratings 
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@thirdFeatureNews.Id">Continue reading</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" src="@thirdFeatureNews.Image" data-holder-rendered="true" style="width: 200px; height: 250px;">
@@ -183,10 +268,31 @@
                     </h3>
                     <div class="mb-1 text-muted">@normalNews1.PublishedDate.Month/@secondFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@normalnews1Text ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-3">
+                            @{
+                                cls = normalNews1.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                            }
+                            <p id="totalLikes">@normalNews1.TotalLikes</p> <button class="@cls">Likes</button>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-3">
+                            @normalNews1.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="align-content-center" style="color:yellow;">
+                            Ratings 
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews1.Id">Continue reading</a>
 
                 </div>
-                @if (normalNews1.Image != "/images/")
+                @if (normalNews1.Image != "/images/news/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="@normalNews1.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@normalNews1.Image" data-holder-rendered="true">
@@ -200,11 +306,32 @@
                     <h3 class="mb-0">
                         <a class="text-dark" href="#">@normalNews2.Title</a>
                     </h3>
-                    <div class="mb-1 text-muted">@normalNews2.PublishedDate.Month/@thirdFeatureNews.PublishedDate.Day</div>
+                    <div class="mb-1 text-muted">@normalNews2.PublishedDate.Month/@normalNews2.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@normalnews2Text ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-3">
+                            @{
+                                cls = normalNews2.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                            }
+                            <p id="totalLikes">@normalNews2.TotalLikes</p> <button class="@cls">Likes</button>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-3">
+                            @normalNews2.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="align-content-center" style="color:yellow;">
+                            Ratings 
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews2.Id">Continue reading</a>
 
-                </div>  @if (normalNews2.Image != "/images/")
+                </div>  @if (normalNews2.Image != "/images/news/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" src="@normalNews2.Image" data-holder-rendered="true" style="width: 200px; height: 250px;">

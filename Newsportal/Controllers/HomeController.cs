@@ -34,13 +34,7 @@ namespace Newsportal.Controllers
 
             if (user != null)
             {
-                foreach (var news in newsList)
-                {
-                    if (news.Likes.Any(n => n.UserId == user.Id))
-                    {
-                        news.UserLikes = true;
-                    }
-                }    
+                newsList.ForEach(n => n.SetUserLikes(user.Id));   
             }
 
             ViewBag.CategoriesList = await _context.Category.ToListAsync();
@@ -72,10 +66,7 @@ namespace Newsportal.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
-                if (detailedNews.Likes.Any(n => n.UserId == user.Id))
-                {
-                    detailedNews.UserLikes = true;
-                }
+                detailedNews.SetUserLikes(user.Id);
             }
             
             if (!detailedNews.IsPublished)
