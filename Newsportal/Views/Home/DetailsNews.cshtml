@@ -1,12 +1,12 @@
 ﻿@model Newsportal.Models.News
 
-
 @{
     ViewData["Title"] = @Model.Title;
     Layout = "_Layout";
 }
 @{
     var cls = @Model.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+    var count = 0;
 }
 <div class="container mt-5">
     <div class="row">
@@ -24,26 +24,37 @@
                     <a class="badge bg-info text-white text-decoration-none link-light" href="#">@Model.Category.CategoryName</a>
                 </header>
                 <!-- Preview image figure-->
-                @if (@Model.Image != null)
+                @if (Model.Image != null)
                 {
                     <figure class="mb-4"><img class="img-fluid rounded" src="@Model.Image" alt="..."></figure>
                 }
 
                 <!-- Post content-->
-                <section class="mb-5">
+                <section class="mb-3">
                     @Html.Raw(Model.Content)
                 </section>
                 <!--End -->
                 <!--Likes and rating section-->
-                <div class="d-flex justify-content-around mb-3">
+                <div class="d-flex justify-content-around">
                     <!--Likes section-->
-                    <p class="my-3">
-                        <p id="totalLikes">@Model.TotalLikes</p> <button class="@cls" onclick="likeNews()" id="likeButton">Likes</button>
+                    <p class="my-1">
+                        <span id="totalLikes">@Model.TotalLikes</span> <span onclick="likeNews()" id="likeButton" class="@cls">Likes</span>
+                    </p>
+                    <!--Comment section-->
+                    <p class=" my-1">
+                        @count Comments
                     </p>
                     <!--Rating section-->
-                    <p class=" my-3">
-                        <p id="totalRating">@Model.Rating</p> Rating
-                    </p>
+                    <div class="d-inline-flex p-2">
+                        <p class="mr-2">Ratings</p>
+                        @for (var i = 0; i < 5; i++)
+                        {
+                            <div class="align-content-center" style="color:black;">
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            </div>
+    
+                        }
+                    </div>
                 </div>
                 <!--End-->
 
@@ -61,7 +72,7 @@
                         <div id="commentList">
                             @foreach (var comment in Model.Comments.ToList())
                             {
-                                ListComment(comment);
+                                count = ListComment(comment);
                             }    
                         </div>
                     </div>
@@ -114,8 +125,9 @@
 @functions
 {
     //DFS algorithm
-    public void ListComment(Comment comment, bool nest = false, int width = 0)
+    public int ListComment(Comment comment, bool nest = false, int width = 0)
     {
+        var count = 1;
         var margin = $"{width}%";
         if (nest)
         {
@@ -147,9 +159,10 @@
         }
         @foreach (var reply in comment.Replies.ToList())
         {
+            count++;
             ListComment(reply, true, width + 5);
         }
-
+        return count;
     }
 }
 
@@ -230,35 +243,35 @@
             }
             
             const url = '@Url.Action("CreateComment", "News")';
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: comment, 
-                    beforeSend: function () {
-                        
-                    },
-                    success: function (result) {
-                        $("#topLevelCommentContent").val("");
-                        let _div = document.createElement('div');
-                        _div.className = "d-flex mt-4";
-                        _div.innerHTML = `                            
-                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
-                            <div class="ms-3">
-                                <div class="fw-bold">${result?.commentedBy}</div>
-                                <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
-                                <p>On: ${result?.commentedOn}</p>
-                                <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
-                            </div>
-                        `;
-                        let replyForm = document.getElementById("commentList");
-                        insertAfter(replyForm, _div);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: comment, 
+                beforeSend: function () {
                     
-                    },
-                    error: function (errorResponse) {
-                        sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
-                        
-                    }
-                });
+                },
+                success: function (result) {
+                    $("#topLevelCommentContent").val("");
+                    let _div = document.createElement('div');
+                    _div.className = "d-flex mt-4";
+                    _div.innerHTML = `                            
+                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
+                        <div class="ms-3">
+                            <div class="fw-bold">${result?.commentedBy}</div>
+                            <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
+                            <p>On: ${result?.commentedOn}</p>
+                            <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
+                        </div>
+                    `;
+                    let replyForm = document.getElementById("commentList");
+                    insertAfter(replyForm, _div);
+                
+                },
+                error: function (errorResponse) {
+                    sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
+                    
+                }
+            });
                 
         });
         
@@ -342,6 +355,67 @@
         function insertAfter(referenceNode, newNode) {
             referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
         }
+        
+        $(document).ready(function () {
+            let ratedIndex = -1;
+            
+            resetStarColors();
+            
+            setStars(Math.round(@Model.Rating));
+
+            $('.fa-star').on('click', function () {
+               ratedIndex = parseInt($(this).data('index'));
+               createRating(ratedIndex);
+            });
+
+            $('.fa-star').mouseover(function () {
+                resetStarColors();
+                let currentIndex = parseInt($(this).data('index'));
+                setStars(currentIndex + 1);
+            });
+
+            $('.fa-star').mouseleave(function () {
+                resetStarColors();
+
+                if (ratedIndex !== -1){
+                    setStars(ratedIndex + 1);
+                }
+                else {
+                    setStars(Math.round(@Model.Rating));
+                }
+            });
+        });
+
+        function createRating(rating) {
+            console.log(rating);
+            let data = {
+                Rating: rating + 1,
+                NewsId: @Model.Id
+            }
+            
+            $.ajax({
+               url: '@Url.Action("CreateRating", "News")',
+               method: "POST",
+               data: data, 
+               success: function (result) {
+                   setStars(result);
+               },
+               error: function (errorResponse) {
+                   sweetAlert("error", "Ooops!...", errorResponse.responseText);
+                   
+               }
+            });
+        }
+
+        function setStars(max) {
+            for (let i=0; i < max; i++)
+                $('.fa-star:eq('+i+')').css('color', 'yellow');
+        }
+
+        function resetStarColors() {
+            $('.fa-star').css('color', 'black');
+        }
+         
         
         function sweetAlert(type, title, message){
             Swal.fire({

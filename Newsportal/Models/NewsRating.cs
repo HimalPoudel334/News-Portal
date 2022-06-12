@@ -16,6 +16,3 @@ public class NewsRating
     public decimal Rating { get; set; }
     
 }
-
-/*
-            */

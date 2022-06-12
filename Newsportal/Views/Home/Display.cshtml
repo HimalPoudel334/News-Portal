@@ -24,9 +24,45 @@
                     </h3>
                     <div class="mb-1 text-muted">@news.PublishedDate.Month/@news.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@newsContent ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-1">
+                            @{
+                                var cls = news.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                                var colors = Convert.ToInt32(news.Rating);
+                            }
+                            @news.TotalLikes <span class="@cls">Likes</span>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-1">
+                            @news.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="d-inline-flex p-2">
+                            <p class="mr-2">Ratings</p>
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                if (i < colors)
+                                {
+                                    <div class="align-content-center" style="color:yellow;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+                                else
+                                {
+                                    <div class="align-content-center" style="color:black;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+        
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@news.Id">Continue reading</a>
                 </div>
-                @if (news.Image != "/images/")
+                @if (news.Image != "/images/news/")
                 {
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="@news.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@news.Image" data-holder-rendered="true">
                 }

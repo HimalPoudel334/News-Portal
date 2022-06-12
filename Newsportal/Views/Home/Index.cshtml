@@ -58,7 +58,43 @@
             </div>
 
             <hr />
+            <div class="d-flex justify-content-around">
+                <!--Likes section-->
+                <p class="my-1">
+                    @{
+                        var cls = breakingNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                        var colors = Convert.ToInt32(breakingNews.Rating);
+                    }
+                    @breakingNews.TotalLikes <span class="@cls">Likes</span>
+                </p>
+                <!--Comment section-->
+                <p class=" my-1">
+                    @breakingNews.Comments.Count Comments
+                </p>
+                <!--Rating section-->
+                <div class="d-inline-flex p-2">
+                    <p class="mr-2">Ratings</p>
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        if (i < colors)
+                        {
+                            <div class="align-content-center" style="color:yellow;">
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            </div>
 
+                        }
+                        else
+                        {
+                            <div class="align-content-center" style="color:black;">
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            </div>
+
+                        }
+
+                    }
+                </div>
+            </div>
+            <hr />
             <div class="d-flex justify-content-around">
                 <p class="my-3">
 
@@ -74,6 +110,7 @@
                     @breakingNews.PublishedDate
 
                 </p>
+                
                 <p class="lead my-3 mb-0"><a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@breakingNews.Id" class="text-primary font-weight-bold">Continue reading...</a></p>
 
             </div>
@@ -101,9 +138,44 @@
                     var text = Html.Raw(newsTry.Content.Substring(0, newsTry.Content.IndexOf("<p>", 500)));}
                 @text
             </div>
-
             <hr />
+            <div class="d-flex justify-content-around">
+                <!--Likes section-->
+                <p class="my-1">
+                    @{
+                        cls = newsTry.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                        colors = Convert.ToInt32(newsTry.Rating);
+                    }
+                    @newsTry.TotalLikes <span class="@cls">Likes</span>
+                </p>
+                <!--Comment section-->
+                <p class=" my-1">
+                    @newsTry.Comments.Count Comments
+                </p>
+                <!--Rating section-->
+                <div class="d-inline-flex p-2">
+                    <p class="mr-2">Ratings</p>
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        if (i < colors)
+                        {
+                            <div class="align-content-center" style="color:yellow;">
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            </div>
 
+                        }
+                        else
+                        {
+                            <div class="align-content-center" style="color:black;">
+                                <i class="fa fa-thin fa-star" data-index="@i"></i>
+                            </div>
+
+                        }
+
+                    }
+                </div>
+            </div>
+            <hr />
             <div class="d-flex justify-content-around">
                 <p class="my-3">
 
@@ -143,6 +215,43 @@
                     </h3>
                     <div class="mb-1 text-muted">@secondFeatureNews.PublishedDate.Month/@secondFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@textTwo ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-1">
+                            @{
+                                cls = secondFeatureNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                                colors = Convert.ToInt32(secondFeatureNews.Rating);
+                            }
+                            @secondFeatureNews.TotalLikes <span class="@cls">Likes</span>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-1">
+                            @secondFeatureNews.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="d-inline-flex p-2">
+                            <p class="mr-2">Ratings</p>
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                if (i < colors)
+                                {
+                                    <div class="align-content-center" style="color:yellow;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+                                else
+                                {
+                                    <div class="align-content-center" style="color:black;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+        
+                            }
+                        </div>
+                    </div>
+                    <hr />
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@secondFeatureNews.Id">Continue reading</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" data-src="@secondFeatureNews.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@secondFeatureNews.Image" data-holder-rendered="true">
@@ -157,6 +266,42 @@
                     </h3>
                     <div class="mb-1 text-muted">@thirdFeatureNews.PublishedDate.Month/@thirdFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@textThree ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-1">
+                            @{
+                                cls = thirdFeatureNews.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                                colors = Convert.ToInt32(thirdFeatureNews.Rating);
+                            }
+                            @thirdFeatureNews.TotalLikes <span class="@cls">Likes</span>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-1">
+                            @thirdFeatureNews.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="d-inline-flex p-2">
+                            <p class="mr-2">Ratings</p>
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                if (i < colors)
+                                {
+                                    <div class="align-content-center" style="color:yellow;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+                                else
+                                {
+                                    <div class="align-content-center" style="color:black;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+        
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@thirdFeatureNews.Id">Continue reading</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" src="@thirdFeatureNews.Image" data-holder-rendered="true" style="width: 200px; height: 250px;">
@@ -183,10 +328,46 @@
                     </h3>
                     <div class="mb-1 text-muted">@normalNews1.PublishedDate.Month/@secondFeatureNews.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@normalnews1Text ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-1">
+                            @{
+                                cls = normalNews1.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                                colors = Convert.ToInt32(normalNews1.Rating);
+                            }
+                            @normalNews1.TotalLikes <span class="@cls">Likes</span>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-1">
+                            @normalNews1.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="d-inline-flex p-2">
+                            <p class="mr-2">Ratings</p>
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                if (i < colors)
+                                {
+                                    <div class="align-content-center" style="color:yellow;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+                                else
+                                {
+                                    <div class="align-content-center" style="color:black;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+        
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews1.Id">Continue reading</a>
 
                 </div>
-                @if (normalNews1.Image != "/images/")
+                @if (normalNews1.Image != "/images/news/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="@normalNews1.Image" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="@normalNews1.Image" data-holder-rendered="true">
@@ -200,11 +381,47 @@
                     <h3 class="mb-0">
                         <a class="text-dark" href="#">@normalNews2.Title</a>
                     </h3>
-                    <div class="mb-1 text-muted">@normalNews2.PublishedDate.Month/@thirdFeatureNews.PublishedDate.Day</div>
+                    <div class="mb-1 text-muted">@normalNews2.PublishedDate.Month/@normalNews2.PublishedDate.Day</div>
                     <p class="card-text mb-auto">@normalnews2Text ...</p>
+                    <div class="d-flex justify-content-around">
+                        <!--Likes section-->
+                        <p class="my-1">
+                            @{
+                                cls = normalNews2.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+                                colors = Convert.ToInt32(normalNews2.Rating);
+                            }
+                            @normalNews2.TotalLikes <span class="@cls">Likes</span>
+                        </p>
+                        <!--Comment section-->
+                        <p class=" my-1">
+                            @normalNews2.Comments.Count Comments
+                        </p>
+                        <!--Rating section-->
+                        <div class="d-inline-flex p-2">
+                            <p class="mr-2">Ratings</p>
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                if (i < colors)
+                                {
+                                    <div class="align-content-center" style="color:yellow;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+                                else
+                                {
+                                    <div class="align-content-center" style="color:black;">
+                                        <i class="fa fa-thin fa-star" data-index="@i"></i>
+                                    </div>
+        
+                                }
+        
+                            }
+                        </div>
+                    </div>
                     <a asp-controller="Home" asp-action="DetailsNews" asp-route-id="@normalNews2.Id">Continue reading</a>
 
-                </div>  @if (normalNews2.Image != "/images/")
+                </div>  @if (normalNews2.Image != "/images/news/")
                 {
 
                     <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Thumbnail [200x250]" src="@normalNews2.Image" data-holder-rendered="true" style="width: 200px; height: 250px;">

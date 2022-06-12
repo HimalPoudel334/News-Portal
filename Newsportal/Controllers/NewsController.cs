@@ -72,26 +72,20 @@ namespace Newsportal.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Category,Title,Content,ImageFile,BreakingNews,FeaturedNews,IsPublished")] News news)
         {
+            
             //var errors = ModelState.Values.SelectMany(v => v.Errors).ElementAt(0);
             news.Category = _context.Category.Where(a => a.Id == news.Category.Id).Single();
 
             // errors = ModelState.Values.SelectMany(v => v.Errors).ElementAt(0);
 
-
-
+            
             if (!ModelState.IsValid)
             {
                 var user = (Reporter)await _userManager.GetUserAsync(this.User);
                 news.Reporter = user;
                 news.PublishedDate = DateTime.Now;
                 news.Image = UploadedFile(news);
-
-                //from cust in customers
-                //where cust.City == "London"
-
-                // news.Category =  from cat in await _context.Category.FindAsync(news.Category) where cat.Id== news.Category.ID select news.Category ;
-
-                _context.Add(news);
+                _context.News.Add(news);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -252,17 +246,21 @@ namespace Newsportal.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateComment(CommentViewModel model)
         {
+            var user = (User) await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+            }
+            
             if (!ModelState.IsValid)
             {
-                return BadRequest("Please enter comment content");
+                return BadRequest("Listen here you dumb fuck! You need to provide correct data to comment");
             }
 
             var news = await _context.News.FindAsync(model.NewsId);
-            var user = (User) await _userManager.GetUserAsync(User);
-            
-            if (user == null || news == null)
+            if (news == null)
             {
-                return BadRequest("Please login first, Cannot find news");
+                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
             }
 
             Comment actualComment = null;
@@ -300,6 +298,75 @@ namespace Newsportal.Controllers
             };
             
             return Ok(reply);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateRating(RatingViewModel model)
+        {
+            var user = (User) await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Listen here you little piece of shit! Give rating properly else I will fuck your mom!");
+            }
+            
+            var news = await _context.News.FindAsync(model.NewsId);
+            if (news == null)
+            {
+                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
+            }
+
+            
+            var rating = await _context.NewsRatings.FirstOrDefaultAsync(r => r.NewsId == news.Id && r.UserId == user.Id);
+            if (rating != null)
+            {
+                rating.Rating = model.Rating;
+                _context.NewsRatings.Update(rating);
+            }
+            else
+            {
+                rating = new NewsRating()
+                {
+                    News = news,
+                    NewsId = news.Id,
+                    User = user,
+                    UserId = user.Id,
+                    Rating = model.Rating
+                };
+                _context.NewsRatings.Add(rating);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("Oops! Something went wrong while updating rating");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("Oops! Something went wrong while saving rating");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("Oops! Something went wrong while saving rating");
+            }
+
+            return Ok(rating.Rating);
+
+            /*Random random = new();
+            
+            return Ok(random.Next(1, 6));*/
+
         }
     }
     
