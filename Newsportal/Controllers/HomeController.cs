@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -48,8 +49,17 @@ namespace Newsportal.Controllers
         }
         public async Task<IActionResult> DisplayAsync(string category)
         {
-
-            return View(await _context.News.Include(n => n.Reporter).Include(n => n.Category).Where(n => n.Category.CategoryName == category).ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            var news = await _context.News
+                .Where(n => n.Category.CategoryName.ToLower() == category.Trim().ToLower())
+                .ToListAsync();
+            
+            if (user != null)
+            {
+                news.ForEach(n => n.SetUserLikes(user.Id));
+            }
+            
+            return View(news);
         }
         public async Task<IActionResult> DetailsNewsAsync(int id)
         {
