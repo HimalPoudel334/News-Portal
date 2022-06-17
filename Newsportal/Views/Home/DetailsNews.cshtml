@@ -136,7 +136,7 @@
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.FirstName</div>
-                    <p>HERE SHOULD BE THE COMMENT REPLY: @comment.Content</p>
+                    <p>@comment.Content</p>
                     <p>On: @comment.CommentedOn</p>
                     <p onclick="showCommentForm(this, @comment.Id)" class="replyComment bg-light">Reply</p>
                 </div>
@@ -150,7 +150,7 @@
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
                     <div class="fw-bold">@comment.CommentedBy.FirstName @comment.CommentedBy.LastName</div>
-                    <p>HERE SHOULD BE THE ACTUAL COMMENT: @comment.Content</p>
+                    <p>@comment.Content</p>
                     <p>On: @comment.CommentedOn</p>
                     <p onclick="showCommentForm(this, @comment.Id)" class="replyComment bg-light">Reply</p>
                 </div>
@@ -257,7 +257,7 @@
                         <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                         <div class="ms-3">
                             <div class="fw-bold">${result?.commentedBy}</div>
-                            <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
+                            <p>${result?.content}</p>
                             <p>On: ${result?.commentedOn}</p>
                             <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
                         </div>
@@ -330,7 +330,7 @@
                 <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
                 <div class="ms-3">
                     <div class="fw-bold">${result?.commentedBy}</div>
-                    <p>HERE SHOULD BE THE COMMENT REPLY: ${result?.content}</p>
+                    <p>${result?.content}</p>
                     <p>On: ${result?.commentedOn}</p>
                     <p onclick="showCommentForm(this, ${result?.id})" class="replyComment bg-light">Reply</p>
                 </div>
