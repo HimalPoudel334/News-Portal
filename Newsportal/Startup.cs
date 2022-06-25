@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+using MlProject.DataModels;
 using Newsportal.Data;
 
 namespace Newsportal
@@ -33,6 +31,9 @@ namespace Newsportal
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            services.AddPredictionEnginePool<NewsModel, CategoryPrediction>()
+                .FromFile("../MlProject/TrainedModels/CategoryPredictionModel.zip");
             
             services.AddControllersWithViews();
             
