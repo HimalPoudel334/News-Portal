@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ML;
+using MlProject.DataModels;
 using Newsportal.ViewModels;
 
 namespace Newsportal.Controllers
@@ -21,13 +23,19 @@ namespace Newsportal.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<NewsController> _logger;
+        private readonly PredictionEnginePool<NewsModel, CategoryPrediction> _predictionEnginePool;
 
-        public NewsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment hostEnvironment, ILogger<NewsController> logger)
+        public NewsController(ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            IWebHostEnvironment hostEnvironment,
+            ILogger<NewsController> logger,
+            PredictionEnginePool<NewsModel,CategoryPrediction> predictionEnginePool)
         {
             _context = context;
             _userManager = userManager;
             webHostEnvironment = hostEnvironment;
             _logger = logger;
+            _predictionEnginePool = predictionEnginePool;
         }
 
         // GET: News
@@ -35,8 +43,8 @@ namespace Newsportal.Controllers
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
             if (User.IsInRole("Admin"))
-                return View(await _context.News.ToListAsync());
-            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).ToListAsync());
+                return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
+            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
         }
 
         // GET: News/Details/5
@@ -60,8 +68,12 @@ namespace Newsportal.Controllers
         // GET: News/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
-            return View();
+            var newsCreateViewModel = new NewsCreateViewModel()
+            {
+                Categories = await _context.Category.ToListAsync()
+            };
+            //ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
+            return View(newsCreateViewModel);
         }
 
         // POST: News/Create
@@ -70,9 +82,54 @@ namespace Newsportal.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create([Bind("Id,Category,Title,Content,ImageFile,BreakingNews,FeaturedNews,IsPublished")] News news)
+        public async Task<IActionResult> Create([Bind("CategoryId,Title,Content,ImageFile,BreakingNews,FeaturedNews,IsPublished")] NewsCreateViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             
+            var reporter = (Reporter)await _userManager.GetUserAsync(this.User);
+            Category category = null;
+            
+            //if Selected category is null, then predict the category of news
+            if (model.CategoryId == null)
+            {
+                var input = new NewsModel()
+                {
+                    Content = model.Content,
+                    Heading = model.Title
+                };
+                //here comes the prediction
+                var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
+                var predictedCategory = prediction.PredictedLabel;
+                category = await _context.Category.FirstOrDefaultAsync(c => c.CategoryName.ToLower() == predictedCategory.ToLower());
+                if (category == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
+                    model.Categories = await _context.Category.ToListAsync();
+                    return View(model);
+                }
+
+            }
+            else
+            {
+                category = await _context.Category.FindAsync(model.CategoryId);
+            }
+
+            var news = new News(DateTime.Now, reporter, category)
+            {
+                Title = model.Title,
+                Content = model.Content,
+                Image = UploadedFile(model)
+
+            };
+
+            _context.News.Add(news);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+            
+            /*
             //var errors = ModelState.Values.SelectMany(v => v.Errors).ElementAt(0);
             news.Category = _context.Category.Where(a => a.Id == news.Category.Id).Single();
 
@@ -84,13 +141,13 @@ namespace Newsportal.Controllers
                 var user = (Reporter)await _userManager.GetUserAsync(this.User);
                 news.Reporter = user;
                 news.PublishedDate = DateTime.Now;
-                news.Image = UploadedFile(news);
+                news.Image = UploadedFile(model);
                 _context.News.Add(news);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
-            return View("create", news);
+            return View("create", news);*/
         }
 
         // GET: News/Edit/5
@@ -121,35 +178,72 @@ namespace Newsportal.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Count,Category,PublishedDate,Title,Content,Image,BreakingNews,FeaturedNews,IsPublished")] News news)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,PublishedDate,Title,Content,ImageFile,IsBreaking,IsBreaking,IsPublished")] NewsUpdateViewModel model)
         {
-            if (id != news.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
+
             if (!ModelState.IsValid)
             {
-                try
-                {
-                    news.Category = _context.Category.Where(a => a.Id == news.Category.Id).Single();
-
-                    _context.Update(news);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NewsExists(news.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(model);
             }
-            return View(news);
+
+            Category category = null;
+            if (model.CategoryId == null)
+            {
+                var input = new NewsModel()
+                {
+                    Content = model.Content,
+                    Heading = model.Title
+                };
+                //here comes the prediction
+                var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
+                var predictedCategory = prediction.PredictedLabel;
+                category = await _context.Category.FirstOrDefaultAsync(c => c.CategoryName.ToLower() == predictedCategory.ToLower());
+                if (category == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
+                    model.Categories = await _context.Category.ToListAsync();
+                    return View(model);
+                }
+
+            }
+            else
+            {
+                category = await _context.Category.FindAsync(model.CategoryId);
+            }
+
+            var news = await _context.News.FindAsync(id);
+            if (news == null) //this shouldn't happen
+            {
+                return NotFound();
+            }
+            
+            news.Category = category;
+            news.PublishedDate = model.PublishedDate;
+            news.Content = model.Content;
+            news.Title = model.Title;
+            news.IsPublished = model.IsPublished;
+            news.FeaturedNews = model.IsFeatured;
+            news.BreakingNews = model.IsBreaking;
+
+            if (model.ImageFile != null)
+            {
+                if (news.Image != null)
+                {
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "image/news/", news.Image);
+                    System.IO.File.Delete(filePath);
+                }
+
+                news.Image = UploadedFile(model);
+            }
+
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), id);
         }
 
         // GET: News/Delete/5
@@ -167,7 +261,7 @@ namespace Newsportal.Controllers
                 return Content("No Content Found to delete");
             }
             if (!User.IsInRole("Admin") && news.IsPublished)
-                return Content("cannot delelte published news");
+                return Content("cannot delete published news");
 
             return View(news);
         }
@@ -178,6 +272,16 @@ namespace Newsportal.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var news = await _context.News.FindAsync(id);
+            if (news == null)
+            {
+                return NotFound();
+            }
+            var newsImage = Path.Combine(webHostEnvironment.WebRootPath, "images/news/", news.Image);
+            if (System.IO.File.Exists(newsImage))
+            {
+                System.IO.File.Delete(newsImage);
+            }
+            
             _context.News.Remove(news);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -188,7 +292,7 @@ namespace Newsportal.Controllers
             return _context.News.Any(e => e.Id == id);
         }
 
-        private string UploadedFile(News model)
+        private string UploadedFile(NewsCreateViewModel model)
         {
             string uniqueFileName = null;
 
@@ -202,7 +306,7 @@ namespace Newsportal.Controllers
                     model.ImageFile.CopyTo(fileStream);
                 }
             }
-            return "/images/" + uniqueFileName;
+            return uniqueFileName;
         }
         
         [HttpPost]
@@ -370,5 +474,7 @@ namespace Newsportal.Controllers
         }
     }
     
-    
+    //implicit operator
+    //        public static implicit operator BalanceType?(string name) => GetInstanceByName<BalanceType>(name);
+
 }

@@ -6,7 +6,7 @@ namespace MlProject.MlModels;
 
 public class CategoryClassifier
 {
-    private static string MLNetModelPath = Path.GetFullPath("CategoryPredictionModel.zip");
+    private static string MLNetModelPath = Path.GetFullPath("../TrainedModels/CategoryPredictionModel.zip");
     
     public static readonly Lazy<PredictionEngine<NewsModel, CategoryPrediction>> PredictEngine = new Lazy<PredictionEngine<NewsModel, CategoryPrediction>>(() => CreatePredictEngine(), true);
 

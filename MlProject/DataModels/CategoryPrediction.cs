@@ -2,13 +2,25 @@ using Microsoft.ML.Data;
 
 namespace MlProject.DataModels;
 
-public class CategoryPrediction : NewsModel
+public class CategoryPrediction
 {
-    [ColumnName(@"PredictedLabel")]
-    public bool PredictionLabel { get; set; }
+    [ColumnName(@"Category")]
+    public uint Category { get; set; }
 
-    public float Probability { get; set; }
+    [ColumnName(@"Heading")]
+    public float[] Heading { get; set; }
+
+    [ColumnName(@"Content")]
+    public float[] Content { get; set; }
+
+    [ColumnName(@"Features")]
+    public float[] Features { get; set; }
+
+    [ColumnName(@"PredictedLabel")]
+    public string PredictedLabel { get; set; }
 
     [ColumnName(@"Score")]
-    public float Score { get; set; }
+    public float[] Score { get; set; }
+
+
 }
