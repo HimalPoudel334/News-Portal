@@ -88,66 +88,55 @@ namespace Newsportal.Controllers
             {
                 return View(model);
             }
-            
-            var reporter = (Reporter)await _userManager.GetUserAsync(this.User);
-            Category category = null;
-            
-            //if Selected category is null, then predict the category of news
-            if (model.CategoryId == null)
+
+            try
             {
-                var input = new NewsModel()
+                var reporter = (Reporter)await _userManager.GetUserAsync(this.User);
+                Category category = null;
+            
+                //if Selected category is null, then predict the category of news
+                if (model.CategoryId == null)
                 {
-                    Content = model.Content,
-                    Heading = model.Title
-                };
-                //here comes the prediction
-                var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
-                var predictedCategory = prediction.PredictedLabel;
-                category = await _context.Category.FirstOrDefaultAsync(c => c.CategoryName.ToLower() == predictedCategory.ToLower());
-                if (category == null)
+                    var input = new NewsModel()
+                    {
+                        Content = model.Content,
+                        Heading = model.Title
+                    };
+                    //here comes the prediction
+                    var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
+                    var predictedCategory = prediction.PredictedLabel;
+                    category = await _context.Category.FirstOrDefaultAsync(c => c.CategoryName.ToLower() == predictedCategory.ToLower());
+                    if (category == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
+                        model.Categories = await _context.Category.ToListAsync();
+                        return View(model);
+                    }
+
+                }
+                else
                 {
-                    ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
-                    model.Categories = await _context.Category.ToListAsync();
-                    return View(model);
+                    category = await _context.Category.FindAsync(model.CategoryId);
                 }
 
-            }
-            else
-            {
-                category = await _context.Category.FindAsync(model.CategoryId);
-            }
+                var news = new News(DateTime.Now, reporter, category)
+                {
+                    Title = model.Title,
+                    Content = model.Content,
+                    Image = UploadedFile(model)
 
-            var news = new News(DateTime.Now, reporter, category)
-            {
-                Title = model.Title,
-                Content = model.Content,
-                Image = UploadedFile(model)
+                };
 
-            };
-
-            _context.News.Add(news);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-            
-            /*
-            //var errors = ModelState.Values.SelectMany(v => v.Errors).ElementAt(0);
-            news.Category = _context.Category.Where(a => a.Id == news.Category.Id).Single();
-
-            // errors = ModelState.Values.SelectMany(v => v.Errors).ElementAt(0);
-
-            
-            if (!ModelState.IsValid)
-            {
-                var user = (Reporter)await _userManager.GetUserAsync(this.User);
-                news.Reporter = user;
-                news.PublishedDate = DateTime.Now;
-                news.Image = UploadedFile(model);
                 _context.News.Add(news);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+
             }
-            ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
-            return View("create", news);*/
+            catch (DbUpdateException e)
+            {
+                _logger.LogError(e.Message);
+                return BadRequest("Something went wrong");
+            }
         }
 
         // GET: News/Edit/5
@@ -157,20 +146,35 @@ namespace Newsportal.Controllers
             {
                 return NotFound();
             }
-
-            ViewBag.Categories = new SelectList(await _context.Category.ToListAsync(), "Id", "CategoryName");
-
-
-            var news = await _context.News.FirstOrDefaultAsync(i => i.Id == id.Value);
-            var user = await _userManager.GetUserAsync(this.User);
-            /*if (news.IsPublished) { return Content("Cannot edit Published news"); }*/
-            //await db.Items.Include(i => i.ItemVerifications).FirstOrDefaultAsync(i => i.Id == id.Value);
-
+            
+            var news = await _context.News.FindAsync(id.Value);
+            var user = (Reporter) await _userManager.GetUserAsync(this.User);
             if (news == null || news.Reporter.Id != user.Id || news.LastEditedBy != null)
             {
                 return NotFound();
             }
-            return View(news);
+
+            if (!User.IsInRole("Admin") && news.IsPublished)
+            {
+                ModelState.AddModelError(string.Empty, "Cannot edit Published news");
+                return BadRequest("Cannot edit Published news");
+            }
+
+            var newsUpdateViewModel = new NewsUpdateViewModel()
+            {
+                Id = news.Id,
+                Image = news.Image,
+                PublishedDate = news.PublishedDate,
+                Categories = await _context.Category.ToListAsync(),
+                Content = news.Content,
+                Title = news.Title,
+                CategoryId = news.Category.Id,
+                IsBreaking = news.BreakingNews,
+                IsFeatured = news.FeaturedNews,
+                IsPublished = news.IsPublished
+            };
+
+            return View(newsUpdateViewModel);
         }
 
         // POST: News/Edit/5
@@ -190,60 +194,80 @@ namespace Newsportal.Controllers
                 return View(model);
             }
 
-            Category category = null;
-            if (model.CategoryId == null)
+            try
             {
-                var input = new NewsModel()
+                Category category = null;
+                if (model.CategoryId == null)
                 {
-                    Content = model.Content,
-                    Heading = model.Title
-                };
-                //here comes the prediction
-                var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
-                var predictedCategory = prediction.PredictedLabel;
-                category = await _context.Category.FirstOrDefaultAsync(c => c.CategoryName.ToLower() == predictedCategory.ToLower());
-                if (category == null)
+                    var input = new NewsModel()
+                    {
+                        Content = model.Content,
+                        Heading = model.Title
+                    };
+                    //here comes the prediction
+                    var prediction = _predictionEnginePool.Predict(modelName: "CategoryClassifier", example: input);
+                    var predictedCategory = prediction.PredictedLabel;
+                    category = await _context.Category.FirstOrDefaultAsync(c =>
+                        c.CategoryName.ToLower() == predictedCategory.ToLower());
+                    if (category == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
+                        model.Categories = await _context.Category.ToListAsync();
+                        return View(model);
+                    }
+
+                }
+                else
                 {
-                    ModelState.AddModelError(string.Empty, "Category could not be predicted. Please enter category");
-                    model.Categories = await _context.Category.ToListAsync();
-                    return View(model);
+                    category = await _context.Category.FindAsync(model.CategoryId);
                 }
 
-            }
-            else
-            {
-                category = await _context.Category.FindAsync(model.CategoryId);
-            }
-
-            var news = await _context.News.FindAsync(id);
-            if (news == null) //this shouldn't happen
-            {
-                return NotFound();
-            }
-            
-            news.Category = category;
-            news.PublishedDate = model.PublishedDate;
-            news.Content = model.Content;
-            news.Title = model.Title;
-            news.IsPublished = model.IsPublished;
-            news.FeaturedNews = model.IsFeatured;
-            news.BreakingNews = model.IsBreaking;
-
-            if (model.ImageFile != null)
-            {
-                if (news.Image != null)
+                var news = await _context.News.FindAsync(id);
+                if (news == null) //this shouldn't happen
                 {
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "image/news/", news.Image);
-                    System.IO.File.Delete(filePath);
+                    return NotFound();
                 }
 
-                news.Image = UploadedFile(model);
+                news.Category = category;
+                news.PublishedDate = model.PublishedDate;
+                news.Content = model.Content;
+                news.Title = model.Title;
+                news.IsPublished = model.IsPublished;
+                news.FeaturedNews = model.IsFeatured;
+                news.BreakingNews = model.IsBreaking;
+
+                if (model.ImageFile != null)
+                {
+                    if (news.Image != null)
+                    {
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "image/news/", news.Image);
+                        System.IO.File.Delete(filePath);
+                    }
+
+                    news.Image = UploadedFile(model);
+                }
+
+                _context.Update(news);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Details), id);
             }
-
-            _context.News.Update(news);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Details), id);
+            catch (DbUpdateConcurrencyException ex)
+            {
+                if (!NewsExists(model.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogError(ex.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                
+            }
+            return BadRequest("Something Went Wrong!");
         }
 
         // GET: News/Delete/5
@@ -466,10 +490,6 @@ namespace Newsportal.Controllers
             }
 
             return Ok(rating.Rating);
-
-            /*Random random = new();
-            
-            return Ok(random.Next(1, 6));*/
 
         }
     }
