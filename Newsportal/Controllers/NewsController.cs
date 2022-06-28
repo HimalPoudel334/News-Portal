@@ -43,8 +43,8 @@ namespace Newsportal.Controllers
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
             if (User.IsInRole("Admin"))
-                return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
-            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
+                return View(await _context.News.ToListAsync());
+            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).ToListAsync());
         }
 
         // GET: News/Details/5

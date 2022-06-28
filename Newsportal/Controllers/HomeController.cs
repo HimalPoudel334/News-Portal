@@ -29,7 +29,7 @@ namespace Newsportal.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            var newsList = await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync();
+            var newsList = await _context.News.ToListAsync();
             
             var user = await _userManager.GetUserAsync(User);
 
