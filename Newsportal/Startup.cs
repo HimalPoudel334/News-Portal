@@ -33,9 +33,6 @@ namespace Newsportal
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             
-            /*services.AddPredictionEnginePool<NewsModel, CategoryPrediction>()
-                .FromFile("../MlProject/TrainedModels/CategoryPredictionModel.zip");*/
-            
             /*
              * At a high level, this code initializes the objects and services automatically for later use when requested by the application instead of having to manually do it.
              * For more info https://docs.microsoft.com/en-us/dotnet/machine-learning/how-to-guides/serve-model-web-api-ml-net#register-predictionenginepool-for-use-in-the-application
@@ -43,6 +40,9 @@ namespace Newsportal
             services.AddPredictionEnginePool<NewsModel, CategoryPrediction>()
                 .FromFile(modelName: "CategoryClassifier", filePath:"../MlProject/TrainedModels/CategoryPredictionModel.zip", watchForChanges: true);
             
+            services.AddPredictionEnginePool<NewsRatingDataModel, NewsRatingPrediction>()
+                .FromFile(modelName: "NewsRecommender", filePath:"../MlProject/TrainedModels/MLModel1.zip", watchForChanges: true);
+
             services.AddControllersWithViews();
             
         }

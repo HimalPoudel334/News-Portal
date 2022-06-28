@@ -21,7 +21,7 @@ namespace Newsportal.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<NewsController> _logger;
         private readonly PredictionEnginePool<NewsModel, CategoryPrediction> _predictionEnginePool;
 
@@ -33,7 +33,7 @@ namespace Newsportal.Controllers
         {
             _context = context;
             _userManager = userManager;
-            webHostEnvironment = hostEnvironment;
+            _webHostEnvironment = hostEnvironment;
             _logger = logger;
             _predictionEnginePool = predictionEnginePool;
         }
@@ -43,8 +43,8 @@ namespace Newsportal.Controllers
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
             if (User.IsInRole("Admin"))
-                return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
-            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
+                return View(await _context.News.ToListAsync());
+            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).ToListAsync());
         }
 
         // GET: News/Details/5
@@ -240,7 +240,7 @@ namespace Newsportal.Controllers
                 {
                     if (news.Image != null)
                     {
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "image/news/", news.Image);
+                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "image/news/", news.Image);
                         System.IO.File.Delete(filePath);
                     }
 
@@ -300,7 +300,7 @@ namespace Newsportal.Controllers
             {
                 return NotFound();
             }
-            var newsImage = Path.Combine(webHostEnvironment.WebRootPath, "images/news/", news.Image);
+            var newsImage = Path.Combine(_webHostEnvironment.WebRootPath, "images/news/", news.Image);
             if (System.IO.File.Exists(newsImage))
             {
                 System.IO.File.Delete(newsImage);
@@ -322,7 +322,7 @@ namespace Newsportal.Controllers
 
             if (model.ImageFile != null)
             {
-                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images/news");
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/news");
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))

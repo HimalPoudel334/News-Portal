@@ -1,12 +1,12 @@
 ﻿@using System.Diagnostics.Metrics
-@model Newsportal.Models.News
+@model Newsportal.ViewModels.DetailedNewsViewModel
 
 @{
-    ViewData["Title"] = @Model.Title;
+    ViewData["Title"] = @Model.News.Title;
     Layout = "_Layout";
 }
 @{
-    var cls = @Model.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+    var cls = @Model.News.UserLikes ? "btn btn-primary" : "btn btn-secondary";
     var count = 0;
 }
 <div class="container mt-5">
@@ -17,29 +17,29 @@
                 <!-- Post header-->
                 <header class="mb-4">
                     <!-- Post title-->
-                    <h1 class="fw-bolder mb-1">@Model.Title</h1>
-                    <div class="d-flex justify-content-end "><p class="border border-info bg-danger text-white">Read Counts: @Model.Count</p></div>
+                    <h1 class="fw-bolder mb-1">@Model.News.Title</h1>
+                    <div class="d-flex justify-content-end "><p class="border border-info bg-danger text-white">Read Counts: @Model.News.Count</p></div>
                     <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">Posted on @Model.PublishedDate.Month/@Model.PublishedDate.Day @Model.PublishedDate.Hour:@Model.PublishedDate.Minute by @Model.Reporter.FirstName @Model.Reporter.LastName</div>
+                    <div class="text-muted fst-italic mb-2">Posted on @Model.News.PublishedDate.Month/@Model.News.PublishedDate.Day @Model.News.PublishedDate.Hour:@Model.News.PublishedDate.Minute by @Model.News.Reporter.FirstName @Model.News.Reporter.LastName</div>
                     <!-- Post categories-->
-                    <a class="badge bg-info text-white text-decoration-none link-light" href="#">@Model.Category.CategoryName</a>
+                    <a class="badge bg-info text-white text-decoration-none link-light" href="#">@Model.News.Category.CategoryName</a>
                 </header>
                 <!-- Preview image figure-->
-                @if (Model.Image != null)
+                @if (Model.News.Image != null)
                 {
-                    <figure class="mb-4"><img class="img-fluid rounded" src="@Model.Image" alt="..."></figure>
+                    <figure class="mb-4"><img class="img-fluid rounded" src="@Model.News.Image" alt="..."></figure>
                 }
 
                 <!-- Post content-->
                 <section class="mb-3">
-                    @Html.Raw(Model.Content)
+                    @Html.Raw(Model.News.Content)
                 </section>
                 <!--End -->
                 <!--Likes and rating section-->
                 <div class="d-flex justify-content-around">
                     <!--Likes section-->
                     <p class="my-1">
-                        <span id="totalLikes">@Model.TotalLikes</span> <span onclick="likeNews()" id="likeButton" class="@cls">Likes</span>
+                        <span id="totalLikes">@Model.News.TotalLikes</span> <span onclick="likeNews()" id="likeButton" class="@cls">Likes</span>
                     </p>
                     <!--Comment section-->
                     <p id="commentCount" class="my-1">
@@ -71,7 +71,7 @@
                             <button type="submit" class="btn btn-primary mt-2">Comment</button>
                         </form>
                         <div id="commentList">
-                            @foreach (var comment in Model.Comments.ToList())
+                            @foreach (var comment in Model.News.Comments.ToList())
                             {
                                 count = ListComment(comment, ++count);
                             }    
@@ -177,7 +177,7 @@
             let likesElement = $("#totalLikes");
             let totalLikes = parseInt(likesElement.text());
             console.log(totalLikes);
-            const newsId = @Model.Id;
+            const newsId = @Model.News.Id;
             
             const url = '@Url.Action("LikeNews", "News")' + '?newsId=' + newsId;
             console.log(url);
@@ -238,7 +238,7 @@
             e.preventDefault();
             const comment = {
                 CommentContent: $("#topLevelCommentContent").val(),
-                NewsId: @Model.Id
+                NewsId: @Model.News.Id
             }
             
             const url = '@Url.Action("CreateComment", "News")';
@@ -281,7 +281,7 @@
                 const comment = {
                     CommentId: commentId,
                     CommentContent: $("#commentReplyContent").val(),
-                    NewsId: @Model.Id
+                    NewsId: @Model.News.Id
                 }              
                 
                 sendCommentToServer(element, comment);
@@ -350,7 +350,7 @@
             
             resetStarColors();
             
-            setStars(Math.round(@Model.Rating));
+            setStars(Math.round(@Model.News.Rating));
 
             $('.fa-star').on('click', function () {
                ratedIndex = parseInt($(this).data('index'));
@@ -370,7 +370,7 @@
                     setStars(ratedIndex + 1);
                 }
                 else {
-                    setStars(Math.round(@Model.Rating));
+                    setStars(Math.round(@Model.News.Rating));
                 }
             });
         });
@@ -379,7 +379,7 @@
             console.log(rating);
             let data = {
                 Rating: rating + 1,
-                NewsId: @Model.Id
+                NewsId: @Model.News.Id
             }
             
             $.ajax({

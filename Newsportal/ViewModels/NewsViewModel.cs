@@ -33,17 +33,6 @@ public class NewsCreateViewModel
 
 }
 
-public class NewsIndexViewModel : NewsCreateViewModel
-{
-    public int Count { get; set; }
-    public decimal Rating { get; set; }
-    public bool UserLikes { get; set; }
-    public virtual ICollection<NewsRating> Ratings { get; set; } = new List<NewsRating>();
-    public virtual ICollection<NewsLikes> Likes { get; set; } = new List<NewsLikes>();
-    public int TotalLikes { get; set; }
-
-}
-
 public class NewsUpdateViewModel : NewsCreateViewModel
 {
     public int Id { get; set; }
@@ -52,4 +41,20 @@ public class NewsUpdateViewModel : NewsCreateViewModel
     [Display(Name = "Published Date")]
     public DateTime PublishedDate { get; set; }
 
+}
+
+public class RecommendedNewsViewModel
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public string Image { get; set; }
+    public decimal Rating { get; set; }
+    public int CategoryId { get; set; }
+}
+
+public class DetailedNewsViewModel
+{
+    public News News { get; set; }
+    
+    public ICollection<RecommendedNewsViewModel> RecommendedNews { get; set; } = new List<RecommendedNewsViewModel>();
 }
