@@ -22,24 +22,18 @@ namespace Newsportal.Models
         
         public int Id { get; init; }
         public int Count { get; set; }
-        
-        [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
         public virtual Category Category { get; set; }
         public virtual Reporter Reporter { get; set; }
-        
-        [Display(Name = "Last Edited By")]
         public virtual Reporter LastEditedBy { get; set; } = null;
-
         public string Title { get; set; }
         public string Content { get; set; }
         public string Image { get; set; }
         public bool BreakingNews { get; set; }
         public bool FeaturedNews { get; set; }
         public bool IsPublished { get; set; }
-
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-
+        
         [NotMapped]
         public decimal Rating {
             get
