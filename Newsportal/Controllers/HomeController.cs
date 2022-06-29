@@ -80,11 +80,14 @@ namespace Newsportal.Controllers
             {
                 return NotFound();
             }
-            
+
+            int userIndex = 1;
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
                 detailedNews.SetUserLikes(user.Id);
+                var allUsers = await _userManager.Users.Select(x => x.Id).ToListAsync();
+                userIndex = allUsers.IndexOf(user?.Id);
             }
 
             var allNews = await _context.News.Where(n => n.Id != detailedNews.Id && n.IsPublished).Select(n => new RecommendedNewsViewModel()
@@ -95,8 +98,6 @@ namespace Newsportal.Controllers
                 Rating = n.Rating,
                 CategoryId = n.Category.Id
             }).ToListAsync();
-            var allUsers = await _userManager.Users.Select(x => x.Id).ToListAsync();
-            var userIndex = allUsers.IndexOf(user.Id) + 1;
             var recommendedNews = new List<RecommendedNewsViewModel>();
             foreach (var news in allNews)
             {
