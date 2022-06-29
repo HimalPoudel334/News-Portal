@@ -1,13 +1,12 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.ML;
+using MlProject.DataModels;
 using Newsportal.Data;
 
 namespace Newsportal
@@ -33,6 +32,16 @@ namespace Newsportal
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            /*services.AddPredictionEnginePool<NewsModel, CategoryPrediction>()
+                .FromFile("../MlProject/TrainedModels/CategoryPredictionModel.zip");*/
+            
+            /*
+             * At a high level, this code initializes the objects and services automatically for later use when requested by the application instead of having to manually do it.
+             * For more info https://docs.microsoft.com/en-us/dotnet/machine-learning/how-to-guides/serve-model-web-api-ml-net#register-predictionenginepool-for-use-in-the-application
+             */
+            services.AddPredictionEnginePool<NewsModel, CategoryPrediction>()
+                .FromFile(modelName: "CategoryClassifier", filePath:"../MlProject/TrainedModels/CategoryPredictionModel.zip", watchForChanges: true);
             
             services.AddControllersWithViews();
             
