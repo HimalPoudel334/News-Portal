@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Newsportal.Models.Category">
+    <Position X="11.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Category.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Newsportal.Models.Comment">
+    <Position X="11.5" Y="0.5" Width="1.5" />
+    <AssociationLine Name="CommentedBy" Type="Newsportal.Models.User" ManuallyRouted="true">
+      <Path>
+        <Point X="12.25" Y="0.5" />
+        <Point X="12.25" Y="0.438" />
+        <Point X="6.448" Y="0.438" />
+        <Point X="6.448" Y="0.969" />
+        <Point X="6" Y="0.969" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.535" Y="0.26" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>EAECAAAAAgAAAAAAAAAAAAAAAAAAAAAgAAAAAAAIAAA=</HashCode>
+      <FileName>Models\Comment.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="News" />
+      <Property Name="CommentedBy" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Newsportal.Models.News">
+    <Position X="8.5" Y="0.5" Width="2.25" />
+    <AssociationLine Name="Likes" Type="Newsportal.Models.NewsLikes" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.031" Y="4.747" />
+        <Point X="10.031" Y="6.188" />
+        <Point X="10.5" Y="6.188" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Ratings" Type="Newsportal.Models.NewsRating">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.01" Y="0.018" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="LastEditedBy" Type="Newsportal.Models.Reporter">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.048" Y="0.193" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>gAACAAAAAjAAAEAAAgCAAAQAAAAICBESAgAgABAAKAA=</HashCode>
+      <FileName>Models\News.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="LastEditedBy" />
+      <Property Name="Category" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Comments" />
+      <Property Name="Likes" />
+      <Property Name="Ratings" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Newsportal.Models.NewsLikes">
+    <Position X="10.5" Y="5.25" Width="1.5" />
+    <AssociationLine Name="User" Type="Newsportal.Models.User" ManuallyRouted="true">
+      <Path>
+        <Point X="10.5" Y="6.867" />
+        <Point X="10.305" Y="6.867" />
+        <Point X="10.305" Y="7.283" />
+        <Point X="5.063" Y="7.283" />
+        <Point X="5.063" Y="2.502" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEBAAAAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\NewsLikes.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="User" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Newsportal.Models.NewsRating">
+    <Position X="6.25" Y="2.5" Width="1.5" />
+    <AssociationLine Name="User" Type="Newsportal.Models.User" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.312" Y="2.5" />
+        <Point X="6.312" Y="1.501" />
+        <Point X="6" Y="1.501" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAEBAAAAAAAgAAAAAAAAAAgAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\NewsRating.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="News" />
+      <Property Name="User" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Newsportal.Models.User">
+    <Position X="3.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAACBACAAAAAAAAAAg=</HashCode>
+      <FileName>Models\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Newsportal.Models.Reporter">
+    <Position X="5.25" Y="5.25" Width="1.75" />
+    <InheritanceLine Type="Newsportal.Models.User" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.875" Y="2.502" />
+        <Point X="4.875" Y="4.875" />
+        <Point X="4.979" Y="4.875" Type="JumpStart" />
+        <Point X="5.146" Y="4.875" Type="JumpEnd" />
+        <Point X="5.812" Y="4.875" />
+        <Point X="5.812" Y="5.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Newsportal.Models.Editor">
+    <Position X="2.25" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Newsportal.Models.Admin">
+    <Position X="3" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
