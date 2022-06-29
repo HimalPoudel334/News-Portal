@@ -33,18 +33,9 @@ namespace Newsportal.Models
 
         public string Title { get; set; }
         public string Content { get; set; }
-
         public string Image { get; set; }
-        [NotMapped]
-        public IFormFile ImageFile { get; set; }
-        
-        [Display(Name = "Braking News")]
         public bool BreakingNews { get; set; }
-        
-        [Display(Name = "Featured News")]
         public bool FeaturedNews { get; set; }
-        
-        [Display(Name = "Is Published")]
         public bool IsPublished { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
