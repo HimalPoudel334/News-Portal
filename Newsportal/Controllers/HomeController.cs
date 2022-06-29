@@ -38,7 +38,7 @@ namespace Newsportal.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            var newsList = await _context.News.ToListAsync();
+            var newsList = await _context.News.Where(n => n.IsPublished).ToListAsync();
             
             var user = await _userManager.GetUserAsync(User);
 
@@ -87,7 +87,7 @@ namespace Newsportal.Controllers
                 detailedNews.SetUserLikes(user.Id);
             }
 
-            var allNews = await _context.News.Select(n => new RecommendedNewsViewModel()
+            var allNews = await _context.News.Where(n => n.Id != detailedNews.Id && n.IsPublished).Select(n => new RecommendedNewsViewModel()
             {
                 Id = n.Id,
                 Title = n.Title,
@@ -110,7 +110,7 @@ namespace Newsportal.Controllers
             
                 //here comes the recommendation
                 var prediction = _predictionEnginePool.Predict(modelName: "NewsRecommender", example: newsRatingInput);
-                if (prediction.Rating >= 4)
+                if (prediction.Score >= 4)
                 {
                     recommendedNews.Add(news);
                 }
