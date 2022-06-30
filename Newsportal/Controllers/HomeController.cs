@@ -86,8 +86,8 @@ namespace Newsportal.Controllers
             if (user != null)
             {
                 detailedNews.SetUserLikes(user.Id);
-                var allUsers = await _userManager.Users.Select(x => x.Id).ToListAsync();
-                userIndex = allUsers.IndexOf(user?.Id);
+                var allUsers = await _userManager.Users.ToListAsync();
+                userIndex = allUsers.IndexOf(user) + 1;
             }
 
             var allNews = await _context.News.Where(n => n.Id != detailedNews.Id && n.IsPublished).Select(n => new RecommendedNewsViewModel()
@@ -111,7 +111,7 @@ namespace Newsportal.Controllers
             
                 //here comes the recommendation
                 var prediction = _predictionEnginePool.Predict(modelName: "NewsRecommender", example: newsRatingInput);
-                if (prediction.Score >= 4)
+                if (Math.Round(prediction.Score, 1) > 3.5)
                 {
                     recommendedNews.Add(news);
                 }

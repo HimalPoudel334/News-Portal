@@ -17,6 +17,7 @@ using Newsportal.ViewModels;
 
 namespace Newsportal.Controllers
 {
+    [Authorize]
     public class NewsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,6 +39,7 @@ namespace Newsportal.Controllers
             _predictionEnginePool = predictionEnginePool;
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: News
         public async Task<IActionResult> Index()
         {
@@ -240,7 +242,7 @@ namespace Newsportal.Controllers
                 {
                     if (news.Image != null)
                     {
-                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "image/news/", news.Image);
+                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images/news/", news.Image);
                         System.IO.File.Delete(filePath);
                     }
 
