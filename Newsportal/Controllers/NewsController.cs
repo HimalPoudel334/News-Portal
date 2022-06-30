@@ -379,18 +379,18 @@ namespace Newsportal.Controllers
             var user = (User) await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+                return BadRequest("Please login to comment");
             }
             
             if (!ModelState.IsValid)
             {
-                return BadRequest("Listen here you dumb fuck! You need to provide correct data to comment");
+                return BadRequest("Something went wrong");
             }
 
             var news = await _context.News.FindAsync(model.NewsId);
             if (news == null)
             {
-                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
+                return BadRequest("Cannot find news!");
             }
 
             Comment actualComment = null;
@@ -437,18 +437,18 @@ namespace Newsportal.Controllers
             var user = (User) await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+                return BadRequest("Please login to comment");
             }
             
             if (!ModelState.IsValid)
             {
-                return BadRequest("Listen here you little piece of shit! Give rating properly else I will fuck your mom!");
+                return BadRequest("Something went wrong!");
             }
             
             var news = await _context.News.FindAsync(model.NewsId);
             if (news == null)
             {
-                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
+                return BadRequest("Oops! Cannot find news");
             }
 
             
