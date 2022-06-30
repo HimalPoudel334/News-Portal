@@ -17,6 +17,7 @@ using Newsportal.ViewModels;
 
 namespace Newsportal.Controllers
 {
+    [Authorize]
     public class NewsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,6 +39,7 @@ namespace Newsportal.Controllers
             _predictionEnginePool = predictionEnginePool;
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: News
         public async Task<IActionResult> Index()
         {

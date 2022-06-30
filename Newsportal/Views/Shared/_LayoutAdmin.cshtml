@@ -32,9 +32,14 @@
                 <div class="top_navbar">
                     <div class="hamburger">
                         <a href="#">
-                            <i class="fas fa-bars"></i>
+                            <i class="fas fa-bars"></i> @ViewData["Title"]
                         </a>
                     </div>
+                </div>
+                <div class="pl-2">
+                    <main role="main" class="pb-3">
+                        @RenderBody()
+                    </main>
                 </div>
             </div>
             <div class="sidebar">
@@ -102,10 +107,7 @@
                 </ul>
             </div>
         </div>
-        <div class="main-content">
-            @RenderBody()
-        </div>
-        <script>
+    <script>
                var hamburger = document.querySelector(".hamburger");
                 hamburger.addEventListener("click", function(){
                     document.querySelector("body").classList.toggle("active");
