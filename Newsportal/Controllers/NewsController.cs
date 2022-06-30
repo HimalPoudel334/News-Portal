@@ -240,7 +240,7 @@ namespace Newsportal.Controllers
                 {
                     if (news.Image != null)
                     {
-                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "image/news/", news.Image);
+                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images/news/", news.Image);
                         System.IO.File.Delete(filePath);
                     }
 
