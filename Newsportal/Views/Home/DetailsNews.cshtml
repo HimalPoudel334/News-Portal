@@ -1,12 +1,11 @@
-﻿@using System.Diagnostics.Metrics
-@model Newsportal.ViewModels.DetailedNewsViewModel
+﻿@model Newsportal.ViewModels.DetailedNewsViewModel
 
 @{
-    ViewData["Title"] = @Model.News.Title;
+    ViewData["Title"] = Model.News.Title;
     Layout = "_Layout";
 }
 @{
-    var cls = @Model.News.UserLikes ? "btn btn-primary" : "btn btn-secondary";
+    var cls = Model.News.UserLikes ? "btn btn-primary" : "btn btn-secondary";
     var count = 0;
 }
 <div class="container mt-5">
@@ -269,8 +268,12 @@
                 
                 },
                 error: function (errorResponse) {
-                    sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
-                    
+                    if(errorResponse.responseText === '' && errorResponse.status === 401) {
+                        sweetAlert("error", "Ooops!...", "Please login to comment");    
+                    }else {
+                        sweetAlert("error", "Ooops!...", errorResponse.responseText);
+                    }                  
+                   
                 }
             });
                 
@@ -284,7 +287,7 @@
                     CommentId: commentId,
                     CommentContent: $("#commentReplyContent").val(),
                     NewsId: @Model.News.Id
-                }              
+                }            
                 
                 sendCommentToServer(element, comment);
             });
@@ -307,7 +310,11 @@
                     document.getElementById("commentCount").innerText = `@(count + 1) Comments`;
                 },
                 error: function (errorResponse) {
-                    sweetAlert("error", "Ooops!...", "Listen here you piece of shit, you are not worthy to comment");
+                    if(errorResponse.responseText === '' && errorResponse.status === 401) {
+                        sweetAlert("error", "Ooops!...", "Please login to comment");    
+                    }else {
+                        sweetAlert("error", "Ooops!...", errorResponse.responseText);
+                    }   
                     let replyForm = document.getElementById("replyFormEnclosingDiv");
                     let parentElement = replyForm.parentNode;
                     parentElement.removeChild(replyForm);
