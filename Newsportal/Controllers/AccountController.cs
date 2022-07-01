@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -18,13 +19,13 @@ public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public AccountController(ILogger<AccountController>  logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    public AccountController(ILogger<AccountController>  logger, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _logger = logger;
         _userManager = userManager;
-        _signInManager = signInManager;
+        _roleManager = roleManager;
     }
 
     public async Task<IActionResult> Index()
@@ -41,64 +42,93 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register([Bind("Email,PhoneNumber,LicenseNumber,FirstName,LastName,UserType,Password")] UserRegisterViewModel model)
+    public async Task<IActionResult> Register([Bind("Email,PhoneNumber,LicenseNumber,FirstName,LastName,Address,UserType,Password,ConfirmPassword")] UserRegisterViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            ModelState.AddModelError(string.Empty, "Please enter required fields");
             return View(model);
         }
 
-        User user = model.UserType switch
+        IdentityResult result = null;
+        switch (model.UserType)
         {
-            UserType.Reporter => new Reporter
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                LicenseNumber = model.LicenseNumber,
-                Address = model.Address,
-                UserType = UserType.Reporter
-            },
-            UserType.Editor => new Editor
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                LicenseNumber = model.LicenseNumber,
-                Address = model.Address,
-                UserType = UserType.Editor
-            },
-            UserType.Admin => new Admin
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                LicenseNumber = model.LicenseNumber,
-                Address = model.Address,
-                UserType = UserType.Admin
-            },
-            _ => new User
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Address = model.Address,
-                UserType = UserType.Subscriber
-            }
-        };
+            case UserType.Admin:
+                Admin admin = new Admin()
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    LicenseNumber = model.LicenseNumber,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    UserType = UserType.Admin
+                };
+                result = await _userManager.CreateAsync(admin, model.Password);
+                break;
+            case UserType.Editor:
+                Editor editor = new Editor()
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    LicenseNumber = model.LicenseNumber,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    UserType = UserType.Editor
+                };
+                result = await _userManager.CreateAsync(editor, model.Password);
+                break;
+            case UserType.Reporter:
+                Reporter reporter = new Reporter()
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    LicenseNumber = model.LicenseNumber,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    UserType = UserType.Reporter
+                };
+                result = await _userManager.CreateAsync(reporter, model.Password);
+                break;
+            default:
+                var user = new User
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    UserType = UserType.Subscriber
+                };
+                result = await _userManager.CreateAsync(user, model.Password);
+                break;
+        }
 
-        var result = await _userManager.CreateAsync(user, model.Password);
+        
         if (result.Succeeded)
         {
             _logger.LogInformation("User created a new account with password.");
+            
+            //add user to role
+            var roles = await _roleManager.Roles.ToListAsync();
+            IdentityRole role = model.UserType switch
+            {
+                UserType.Admin => roles.FirstOrDefault(r => r.Name == "Admin"),
+                UserType.Editor => roles.FirstOrDefault(r => r.Name == "Editor"),
+                UserType.Reporter => roles.FirstOrDefault(r => r.Name == "Reporter"),
+                _ => null
+            };
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return LocalRedirect(nameof(Index));
+            if (role != null)
+            {
+                //await _userManager.AddToRoleAsync(user, role.Name);
+            }
+            return RedirectToAction(nameof(Index));
         }
         foreach (var error in result.Errors)
         {

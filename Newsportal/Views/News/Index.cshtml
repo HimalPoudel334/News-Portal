@@ -13,6 +13,9 @@
                     @Html.DisplayNameFor(model => model.Count)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.PublishedDate)
                 </th>
                 <th>
@@ -39,6 +42,9 @@
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => item.Count)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.CategoryName)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.PublishedDate)

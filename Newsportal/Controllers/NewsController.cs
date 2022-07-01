@@ -45,8 +45,8 @@ namespace Newsportal.Controllers
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
             if (User.IsInRole("Admin"))
-                return View(await _context.News.ToListAsync());
-            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).ToListAsync());
+                return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
+            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
         }
 
         // GET: News/Details/5
@@ -242,7 +242,7 @@ namespace Newsportal.Controllers
                 {
                     if (news.Image != null)
                     {
-                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images/news/", news.Image);
+                        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "news", news.Image);
                         System.IO.File.Delete(filePath);
                     }
 
@@ -302,7 +302,7 @@ namespace Newsportal.Controllers
             {
                 return NotFound();
             }
-            var newsImage = Path.Combine(_webHostEnvironment.WebRootPath, "images/news/", news.Image);
+            var newsImage = Path.Combine(_webHostEnvironment.WebRootPath, "images", "news", news.Image);
             if (System.IO.File.Exists(newsImage))
             {
                 System.IO.File.Delete(newsImage);
@@ -324,7 +324,7 @@ namespace Newsportal.Controllers
 
             if (model.ImageFile != null)
             {
-                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/news");
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "news");
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -379,18 +379,18 @@ namespace Newsportal.Controllers
             var user = (User) await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+                return BadRequest("Please login to comment");
             }
             
             if (!ModelState.IsValid)
             {
-                return BadRequest("Listen here you dumb fuck! You need to provide correct data to comment");
+                return BadRequest("Something went wrong");
             }
 
             var news = await _context.News.FindAsync(model.NewsId);
             if (news == null)
             {
-                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
+                return BadRequest("Cannot find news!");
             }
 
             Comment actualComment = null;
@@ -437,18 +437,18 @@ namespace Newsportal.Controllers
             var user = (User) await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return BadRequest("Listen here you dumb fuck! Don't you have some common sense. You need to login to comment");
+                return BadRequest("Please login to comment");
             }
             
             if (!ModelState.IsValid)
             {
-                return BadRequest("Listen here you little piece of shit! Give rating properly else I will fuck your mom!");
+                return BadRequest("Something went wrong!");
             }
             
             var news = await _context.News.FindAsync(model.NewsId);
             if (news == null)
             {
-                return BadRequest("Cannot find news. Looks like you did something fishy you little shit!");
+                return BadRequest("Oops! Cannot find news");
             }
 
             
