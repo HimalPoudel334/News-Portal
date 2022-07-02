@@ -4,8 +4,11 @@
     ViewData["Title"] = "Index";
     Layout = "_LayoutAdmin";
 }
-
-<div class="table table-responsive">
+<br />
+<a asp-action="Create" asp-controller="News" class="btn btn-success">Create New News</a>
+<br />
+<br />
+<div class="table table-responsive"  style="width:100%">
     <table class="table table-header-bg">
         <thead>
             <tr>
@@ -24,9 +27,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Content)
                 </th>
-                <th>
+                @*<th>
                     @Html.DisplayNameFor(model => model.Image)
-                </th>
+                </th>*@
                 <th>
                     @Html.DisplayNameFor(model => model.Reporter)
                 </th>
@@ -63,9 +66,9 @@
 
                         @valuev<a asp-action="Details" asp-route-id="@item.Id">Details</a>
                     </td>
-                    <td>
+                    @*<td>
                         @Html.DisplayFor(modelItem => item.Image)
-                    </td>
+                    </td>*@
                     <td>
                         @Html.DisplayFor(modelItem => item.Reporter.FirstName)
                     </td>

@@ -20,13 +20,13 @@ public class NewsCreateViewModel
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     
     [Display(Name = "Featured News")]
-    public bool IsFeatured { get; set; } = false;
+    public bool IsFeatured { get; set; }
     
-    [Display(Name = "Braking News")]
-    public bool IsBreaking { get; set; } = false;
+    [Display(Name = "Breaking News")]
+    public bool IsBreaking { get; set; }
     
     [Display(Name = "Published News")]
-    public bool IsPublished { get; set; } = false;
+    public bool IsPublished { get; set; }
     
     [Display(Name = "Image")]
     public IFormFile? ImageFile { get; set; }

@@ -73,7 +73,8 @@
                             <span class="item">Categories</span>
                         </a>
                     </li>
-                    <li>
+                    @if(User.IsInRole("Admin")){
+                        <li>
                         <a asp-action="Index" asp-controller="Account">
                             <span class="icon"><i class="fas fa-user-friends"></i></span>
                             <span class="item">Users</span>
@@ -103,6 +104,8 @@
                             <span class="item">Settings</span>
                         </a>
                     </li>
+                    }
+                    
                 </ul>
             </div>
         </div>

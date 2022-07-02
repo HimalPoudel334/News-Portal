@@ -39,14 +39,36 @@ namespace Newsportal.Controllers
             _predictionEnginePool = predictionEnginePool;
         }
 
-        [Authorize(Roles = "Admin")]
         // GET: News
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? type)
         {
             var user = (Reporter)await _userManager.GetUserAsync(this.User);
-            if (User.IsInRole("Admin"))
-                return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
-            return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
+
+            if (type == "Unpublished")
+            {
+                if (User.IsInRole("Admin"))
+                    return View(await _context.News.Where(n => !n.IsPublished).OrderByDescending(n => n.PublishedDate).ToListAsync());
+                return View(await _context.News.Where(a => a.Reporter.Id == user.Id && !a.IsPublished).OrderByDescending(n => n.PublishedDate).ToListAsync());
+            }
+            else if (type == "MostRead")
+            {
+                if (User.IsInRole("Admin"))
+                    return View(await _context.News.Where(n=>n.IsPublished).OrderByDescending(n => n.Count).ToListAsync());
+                return View(await _context.News.Where(a => a.Reporter.Id == user.Id && a.IsPublished).OrderByDescending(n => n.Count).ToListAsync());
+            }
+            else if (type == "MostCommented")
+            {
+                if (User.IsInRole("Admin"))
+                    return View(await _context.News.Include(n => n.Comments).ThenInclude(c => c.Replies).OrderByDescending(n => n.Comments.Count).ToListAsync());
+                return View(await _context.News.Where(a => a.Reporter.Id == user.Id && a.IsPublished).OrderByDescending(n => n.Comments.Count).ToListAsync());
+            }
+            else
+            {
+                if (User.IsInRole("Admin"))
+                    return View(await _context.News.OrderByDescending(n => n.PublishedDate).ToListAsync());
+                return View(await _context.News.Where(a => a.Reporter.Id == user.Id).OrderByDescending(n => n.PublishedDate).ToListAsync());
+            }
+            
         }
 
         // GET: News/Details/5
@@ -84,7 +106,7 @@ namespace Newsportal.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create([Bind("CategoryId,Title,Content,ImageFile,BreakingNews,FeaturedNews,IsPublished")] NewsCreateViewModel model)
+        public async Task<IActionResult> Create([Bind("CategoryId,Title,Content,ImageFile,IsBreaking,IsFeatured,IsPublished")] NewsCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -125,7 +147,10 @@ namespace Newsportal.Controllers
                 {
                     Title = model.Title,
                     Content = model.Content,
-                    Image = UploadedFile(model)
+                    Image = UploadedFile(model),
+                    IsPublished = model.IsPublished,
+                    BreakingNews = model.IsBreaking,
+                    FeaturedNews = model.IsFeatured
 
                 };
 
@@ -184,7 +209,7 @@ namespace Newsportal.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,PublishedDate,Title,Content,ImageFile,IsBreaking,IsBreaking,IsPublished")] NewsUpdateViewModel model)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,PublishedDate,Title,Content,ImageFile,IsFeatured,IsBreaking,IsPublished")] NewsUpdateViewModel model)
         {
             if (id != model.Id)
             {
@@ -251,7 +276,7 @@ namespace Newsportal.Controllers
 
                 _context.Update(news);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Details), id);
+                return RedirectToAction(nameof(Details), new {news.Id});
             }
             catch (DbUpdateConcurrencyException ex)
             {

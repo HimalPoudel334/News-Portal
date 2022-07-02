@@ -38,13 +38,19 @@
             @Html.DisplayNameFor(model => model.Content)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
+            @{
+                var content = Html.Raw(Model.Content);
+            }
+            @content
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Image)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
+            @if (Model.Image != null)
+            {
+                <figure class="mb-4"><img class="img-fluid rounded" width="200" height="200" src="/images/news/@Model.Image" alt="..."></figure>
+            }
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.BreakingNews)
